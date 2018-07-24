@@ -9,6 +9,7 @@ import Utils_Web,FileRW
 
 
 
+
 #A1 获得一条微博下的评论，转发和点赞名单
 
 def get_commetList(weiboID):
@@ -17,7 +18,7 @@ def get_commetList(weiboID):
     print('微博的ID为：'+weiboID)  
     if (not weiboID.isdigit()):
         weiboID = murl_to_mid(weiboID)
-    # print('微博的数字ID为：'+weiboID)  
+    print('微博的数字ID为：'+weiboID)  
 
     comment_url = 'http://m.weibo.cn/api/comments/show' 
     repost_url = 'http://m.weibo.cn/api/statuses/repostTimeline'
@@ -37,7 +38,7 @@ def get_commetList(weiboID):
 #B1 从一个Url(评论，转发)中获得IDList  感觉可以用下面点赞的逻辑来合并成一个呢。
 def getIDList(url,weiboID):
     idList = []
-    print('访问' + url)
+    print('访问评论的URL：' + url)
     pageCnt = 1
     payload = {
             'id': str(weiboID),
@@ -47,6 +48,7 @@ def getIDList(url,weiboID):
     if jsonData['ok'] == 0 :
         print(".......数量为0哦……")
         return idList
+    jsonData = jsonData['data']
     total_number =  jsonData['total_number'] #评论总数  他说是287。我只拿到268
     cnt = jsonData['max'] #页数  max等于29 那么payload中不可以要求30.
     print("总数量为："+ str(total_number) + " 总页数："+ str(cnt))
@@ -55,6 +57,11 @@ def getIDList(url,weiboID):
             'id': str(weiboID),
             'page':str(i+1), }
         jsonData = Utils_Web.GetUrlData(s,url,params = payload)
+        if jsonData.get('data'):
+            jsonData = jsonData['data']
+        else:
+            print('返回的JSON拿不到data字段，结束')
+            break  
         print("开始遍历页："+ str(i+1) + " 本页数量："+ str(len(jsonData['data'])))
         # print("第一个"+ str(jsonData['data'][0]))
         for k in jsonData['data']:  #每一页
@@ -68,45 +75,31 @@ def getIDList(url,weiboID):
 def getIDList_Att(url,weiboID):
     print('访问点赞页:' + url)
     idList = []
-    total_number = 1
     pageCnt = 1
-    while total_number > 0:
-
+    while True:
         payload = {
                 'id': str(weiboID),
                 'page':str(pageCnt), 
                 }
         jsonData = Utils_Web.GetUrlData(s,url,params = payload)
-        total_number =  jsonData['total_number'] #本页点赞总数
-        print("点赞页：%s。 本页数量：%s"%(pageCnt,total_number))
-        if total_number == 0:
-            print('点赞页完成，总页数：'+ str(pageCnt))
+        if jsonData.get('data'):
+            jsonData = jsonData['data']
+        else:
+            print('返回的JSON拿不到data字段，结束')
+            break  
+        page_number =  len(jsonData['data']) #本页点赞总数
+        print("点赞页：%s。 本页数量：%s"%(pageCnt,page_number))
+        if page_number == 0:
+            print('点赞页完成，总页数：'+ str(pageCnt-1))
             break
-        # print("本页点赞总数："+ str(total_number))
         for k in jsonData['data']:  #每一页  这里的结构，被改掉了。 目前返回一个html. <a href="/u/2369434535">
             userid =  k['user']['id']
             idList.append(userid)
         pageCnt += 1
-    # idList = list(set(idList))
     print('获得点赞名单长度：' + str(len(idList)))
+    # idList = list(set(idList))
     return idList
-
-#C1 （旧）访问Url,处理获得的数据，变成Json格式
-def getUrlJson(url,payload):
-    data = s.get(url, headers = headers_mweibo ,cookies = cookies, params=payload)
-    if(data.status_code != 200):
-        print("----------访问出错,没有返回正确数据------------")
-        return None
-    dataStr = data.text #bytes    注意：这里可以直接使用.json()
-    dataStr = dataStr.replace('\\"','#')
-    dataStr = codecs.decode(dataStr,'unicode_escape')  #textStr
-    jsonData = json.loads(dataStr)  #json get
-    if jsonData['ok'] == 0 :
-        print('这条微博 ' + jsonData['msg'])
-        return None
-    return jsonData
-    
-
+   
 #A2 根据用户ID，取得用户信息（ 通过PC端弹出小的卡片   
 def get_userInfo(userID):
     print("尝试获取用户信息",userID)
@@ -141,6 +134,11 @@ def get_userInfo(userID):
         info['area'] = ""
     else:
         info['area'] =  area[0].text
+    school = contentTree.xpath('//a[contains(@suda-uatrack,"chick_school")]')   #----地址
+    if len(school) == 0:
+        info['school'] = ""
+    else:
+        info['school'] =  school[0].text
     print(info)
     return info
 
@@ -149,14 +147,19 @@ def get_userInfo(userID):
 #---------判断一个用户是不是目标
 def F_UserID(userID):
     infoDic = get_userInfo(userID)
-    if infoDic['gender'] != "女": #后面一定是正确性别
-        print("非目标性别,PASS")
-        return False      
-    strLoc = infoDic['area']
-    if strLoc != None and strLoc.find('广州') != -1:
+    # if infoDic['gender'] != "女": #后面一定是正确性别
+    #     print("非目标性别,PASS")
+    #     return False      
+    strLoc = infoDic.get('area')
+    if strLoc != None and strLoc.find('深圳') != -1:
         print("------------目标通过------------")
         return True
-    print("性别通过，地址不通过,PASS")
+
+    strSchool = infoDic.get('school')
+    if strSchool != None and strSchool.find('深圳') != -1:
+        print("------------目标通过------------")
+        return True
+    # print("性别通过，地址不通过,PASS")
     return False
 
 
@@ -186,16 +189,16 @@ def murl_to_mid(murl):
         mid = str(value) + mid
     return mid
 #----------------------------------主启动
-def main(weiboID = 'F85ViahQz' , midCnt = 0):
+def main(weiboID = 'GnYmridwO' , midCnt = 0):
     tarlist = []  #保存最后的结果
     # if (not ToJsonData_Q(questionID)):  #先判断是否存在已经
     #     return
     IDlist = get_commetList(weiboID) #回答者列表
     tarlist = Utils_Web.F_List(IDlist,F_UserID,curCnt = midCnt)
-    # print("---1 问题晒选结果",tarlist)
+    print("---1 问题晒选结果",tarlist)
     # ToJsonData_Q(questionID,mode = "W")  
     # tarlist = ToJsonData_U(tarlist)
-    print("-------------------- 最后结果",tarlist)
+    # print("-------------------- 最后结果",tarlist)
     
 
 #头部信息
@@ -220,14 +223,15 @@ s = Utils_Web.GetSession(headers_mweibo,cookDomain) #这里有两个……header
 if __name__ == '__main__':
     testStr= 'main'  #入口
     if testStr == 'get_userInfo':
-        userID = '1780207091'
+        userID = '2853972281'
         info = get_userInfo(userID)
         print(info)
     if testStr == 'get_comment':  
-        lista = get_commetList('EFNUPod1F')
+        lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'EyQ5zr1Iv'
-        main()
+        weiboID = 'Gk7VglNw2'
+        midCnt = 150
+        main(weiboID,midCnt)
 
 
 

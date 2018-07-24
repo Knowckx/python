@@ -5,6 +5,10 @@ import FileRW
 from win32.win32crypt import CryptUnprotectData
 import os,sqlite3,time
 import requests
+import datetime
+
+
+ReqTimeR = datetime.datetime.now()
 
 #给定站点，找出相应的Cookies
 def getcookiefromchrome(host='.zhihu.com',typeID = 1):
@@ -24,13 +28,25 @@ def getcookiefromchrome(host='.zhihu.com',typeID = 1):
     return cookies
 
 
-#request.get的通用处理。访问三次，并的返回的数据预处理一下 |
-# 这个模型不错.先看看有没有问题。假如有问题，执行3次后弹错。
 
 
+#最小重复的时间间隔机制
+def LimitTryTimer():
+    minReqTimeSpan = 0.5 #req之间最小间隔
+    reTryTimeSpan = 0.3 #命中最小间隔内后的等待时间
 
+    global ReqTimeR
+    while(True):
+        timeNow = datetime.datetime.now()
+        span = (timeNow - ReqTimeR).total_seconds()
+        if span>minReqTimeSpan:
+            ReqTimeR = timeNow
+            break
+        # print("Time:" + str(span))
+        time.sleep(reTryTimeSpan * 1)
 
 def GetUrlData(s,url,encoding = 'utf-8',**kw):  
+    LimitTryTimer()
     tryCnt = 0
     resp = FileRW.TryFunc(s.get,url,**kw)  #第一次请求
     while(resp.status_code != requests.codes.ok):
