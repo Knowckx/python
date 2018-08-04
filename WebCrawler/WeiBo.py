@@ -23,9 +23,12 @@ def get_commetList(weiboID):
     comment_url = 'http://m.weibo.cn/api/comments/show' 
     repost_url = 'http://m.weibo.cn/api/statuses/repostTimeline'
     zan_url = 'http://m.weibo.cn/api/attitudes/show'
+    
     list1 = getIDList(comment_url,weiboID) #求评论数据的用户
     list2 = getIDList(repost_url,weiboID)  #转发用户
     list3 = getIDList_Att(zan_url,weiboID)
+
+
     idList = []   #存放用户ID
     for v in [list1,list2,list3]:  #三个列表相加
         if v!= None:
@@ -147,9 +150,9 @@ def get_userInfo(userID):
 #---------判断一个用户是不是目标
 def F_UserID(userID):
     infoDic = get_userInfo(userID)
-    # if infoDic['gender'] != "女": #后面一定是正确性别
-    #     print("非目标性别,PASS")
-    #     return False      
+    if infoDic.get('gender') != "女": #后面一定是正确性别
+        print("非目标性别,PASS")
+        return False      
     strLoc = infoDic.get('area')
     if strLoc != None and strLoc.find('深圳') != -1:
         print("------------目标通过------------")
@@ -189,7 +192,7 @@ def murl_to_mid(murl):
         mid = str(value) + mid
     return mid
 #----------------------------------主启动
-def main(weiboID = 'GnYmridwO' , midCnt = 0):
+def main(weiboID = 'GrJbpyCNl' , midCnt = 0):
     tarlist = []  #保存最后的结果
     # if (not ToJsonData_Q(questionID)):  #先判断是否存在已经
     #     return
@@ -229,8 +232,8 @@ if __name__ == '__main__':
     if testStr == 'get_comment':  
         lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'Gk7VglNw2'
-        midCnt = 150
+        weiboID = 'Gt3Tan5HO'
+        midCnt = 0
         main(weiboID,midCnt)
 
 
