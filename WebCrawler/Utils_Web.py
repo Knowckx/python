@@ -32,7 +32,7 @@ def getcookiefromchrome(host='.zhihu.com',typeID = 1):
 
 #最小重复的时间间隔机制
 def LimitTryTimer():
-    minReqTimeSpan = 0.5 #req之间最小间隔
+    minReqTimeSpan = 1 #req之间最小间隔
     reTryTimeSpan = 0.3 #命中最小间隔内后的等待时间
 
     global ReqTimeR

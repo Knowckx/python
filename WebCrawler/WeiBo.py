@@ -12,7 +12,7 @@ import Utils_Web,FileRW
 
 #A1 获得一条微博下的评论，转发和点赞名单
 
-def get_commetList(weiboID):
+def get_commetList(weiboID,mode=111):
     # PC端的微博地址需要目标博主的ID。
     # 而移动端微博地址为：http://m.weibo.cn/status/EFH5lqCHj  | 后面的字符串换成数字也是可以的
     print('微博的ID为：'+weiboID)  
@@ -20,19 +20,24 @@ def get_commetList(weiboID):
         weiboID = murl_to_mid(weiboID)
     print('微博的数字ID为：'+weiboID)  
 
-    comment_url = 'http://m.weibo.cn/api/comments/show' 
-    repost_url = 'http://m.weibo.cn/api/statuses/repostTimeline'
-    zan_url = 'http://m.weibo.cn/api/attitudes/show'
     
-    list1 = getIDList(comment_url,weiboID) #求评论数据的用户
-    list2 = getIDList(repost_url,weiboID)  #转发用户
-    list3 = getIDList_Att(zan_url,weiboID)
-
-
     idList = []   #存放用户ID
-    for v in [list1,list2,list3]:  #三个列表相加
-        if v!= None:
-            idList.extend(v)
+
+    comment_url = 'http://m.weibo.cn/api/comments/show'
+    ResL = getIDList(comment_url,weiboID) #求评论数据的用户
+    if ResL!= None:
+        idList.extend(ResL)
+
+    repost_url = 'http://m.weibo.cn/api/statuses/repostTimeline'
+    ResL = getIDList(repost_url,weiboID)  #转发用户
+    if ResL!= None:
+        idList.extend(ResL)
+
+    zan_url = 'http://m.weibo.cn/api/attitudes/show'
+    ResL = getIDList_Att(zan_url,weiboID)
+    if ResL!= None:
+        idList.extend(ResL)
+
     print("相加总数：%s"%len(idList))
     idList = list(set(idList))
     print("最后取得用户列表长度：%s"%len(idList))
@@ -192,7 +197,9 @@ def murl_to_mid(murl):
         mid = str(value) + mid
     return mid
 #----------------------------------主启动
-def main(weiboID = 'GrJbpyCNl' , midCnt = 0):
+
+
+def main(weiboID = 'GCpgNmeYL' , midCnt = 0):
     tarlist = []  #保存最后的结果
     # if (not ToJsonData_Q(questionID)):  #先判断是否存在已经
     #     return
@@ -232,7 +239,7 @@ if __name__ == '__main__':
     if testStr == 'get_comment':  
         lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'Gt3Tan5HO'
+        weiboID = 'GCpgNmeYL'
         midCnt = 0
         main(weiboID,midCnt)
 
