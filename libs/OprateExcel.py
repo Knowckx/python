@@ -2,8 +2,6 @@ import win32com.client
 
 
 #----------操作Excel表
-# 传入0 导出A与A+等级的到文本中
-# 传入1 导出B+、A-、A与A+等级的到文本中
 def Filter(rate):
     o = win32com.client.Dispatch("Excel.Application") #抓到Excel进程
     o.Visible = 1
@@ -38,10 +36,6 @@ path = r'C:\Users\Administrator\Desktop\股票\ListStock.py'
 with open(path, 'w') as f:
     f.write(str(LStock))
     
-
-
-
-
 
 #Workbooks.Open 打开
 #Workbooks.Add()  #新增 返回一个Workbook
