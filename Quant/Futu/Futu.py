@@ -19,5 +19,5 @@ def GetTickToExcel(StockID):
     df = GetTick(StockID)
     df.to_excel('tmp.xlsx',sheet_name=StockID)
 
-StockID = 'HK.08611'
+StockID = 'HK.08613'
 GetTickToExcel(StockID)
