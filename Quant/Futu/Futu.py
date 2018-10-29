@@ -17,7 +17,9 @@ def GetTick(ID):
 
 def GetTickToExcel(StockID):
     df = GetTick(StockID)
-    df.to_excel('tmp.xlsx',sheet_name=StockID)
+    fPath = 'Docs/' + StockID + '.xlsx'
+    # df.to_excel('tmp.xlsx',sheet_name=StockID)
+    df.to_excel(fPath,sheet_name=StockID)
 
-StockID = 'HK.08613'
+StockID = 'HK.01034'
 GetTickToExcel(StockID)
