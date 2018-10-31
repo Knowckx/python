@@ -1,15 +1,3 @@
-import os
-
-
-#bug用 打印出来
-def Wfile(path,tarString):
-    with open(path, 'w', encoding='utf-8') as f:  
-        f.write(tarString)
-
-
-def Rfile(path):
-    with open(path, 'r', encoding='utf-8') as f:  
-        return f.read()
 
 
 #最后还是没用装饰器。
@@ -31,11 +19,6 @@ def TryFunc(func , *args ,**kw ):
 
 def TestA(a):
     print("text123" + str(a))
-
-
-
-
-LAA = ['da-hao-nu-hai-gi', 'MissLifeBeauty', 'wu-jin-hong-94', 'Rachelfang', 'shi-yu-12-6', 'xu-li-71-29']
 
 if __name__ == '__main__':
     path = "../WebCrawler/Data/Zhihu_GZ.txt"
