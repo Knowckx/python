@@ -1,6 +1,8 @@
 from sys import path as sys_path  #为了加载一个Utlity~容易么我。
 sys_path.insert(0,"../utils")
-import FileRW
+
+
+from libs import FileRW
 
 from win32.win32crypt import CryptUnprotectData
 import os,sqlite3,time
@@ -10,6 +12,27 @@ import datetime
 
 ReqTimeR = datetime.datetime.now()
 
+
+
+
+
+# 最简单的get请求
+def SimpleGet (url,params = None):
+    s = requests.session()
+    resp = s.get(url,params=params)
+    if resp.status_code != requests.codes.ok:
+        print("get url return status is not 200")
+        requests.Response.raise_for_status()
+    return resp.text
+
+def SaveStr (str):
+    path = 'web/text/test.html'
+    FileRW.Wfile(path,str)
+
+def LoadStr ():
+    path = 'web/text/test.html'
+    rst = FileRW.Rfile(path)
+    return rst
 
 
 #最小重复的时间间隔机制
@@ -90,5 +113,7 @@ if testStr == 'GetUrlData':
         }
     data = GetUrlData(requests,url,params = payload)
     print(data)
+
+
 
 
