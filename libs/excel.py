@@ -1,6 +1,6 @@
 import pandas as pd
 
-def ReadExcel(fPath):
+def PDReadExcel(fPath):
     fPath = 'Quant/util/test.xlsx'
     with pd.ExcelFile(fPath) as xlsF:
         aa =xlsF.sheet_names
@@ -13,7 +13,7 @@ def ReadExcel(fPath):
         # print(data1)
 
 
-def WriteExcel(df,fPath):
+def PDWriteExcel(df,fPath):
         df_out.to_excel('tmp.xlsx',sheet_name='data')
 
         EW = pandas.ExcelWriter(fileName)
