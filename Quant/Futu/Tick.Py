@@ -15,7 +15,7 @@ quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
 handler = TickerTest()
 quote_ctx.set_handler(handler)
 
-StockID = 'HK.01034'
+StockID = 'HK.08259'
 quote_ctx.subscribe([StockID], [SubType.TICKER])
 # time.sleep(100)
 # quote_ctx.close()
