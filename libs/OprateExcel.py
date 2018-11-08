@@ -1,42 +1,67 @@
 import win32com.client
 
 
+sht = 0
+priceL = []
+
+
 
 #----------操作Excel表
-def Filter(rate):
+def GetExcelSht(index=0):
     o = win32com.client.Dispatch("Excel.Application") #抓到Excel进程
     o.Visible = 1
-    sht = o.Worksheets[0]
+    sht = o.Worksheets[index]
+    return sht
 
-    i = 2  #取Excel的代码值
-    LStock = ''
-    count = 0 
-    while (i<3000):
-        Score = sht.Cells(i,4).Value  #得到评级
-        if(Score ==''):
-            print('在' + i + '发现空值 退出')
+def findCol(tar =""):
+    for i in range(1,100):
+        if sht.Cells(1,i).Value == tar:
+            return i
+    print("can't find target col")
+    return -1
+    	
+def LoopCol(colI=1):
+    i=0
+    while True:
+        i = i + 1
+        prc = sht.Cells(i,colI).Value
+        print(i,prc)
+        if prc == None or prc == "":
             break
-        if (rate == 0):
-            if(Score =='A+') or (Score =='A'):
-                StockCode = sht.Cells(i,1).Value
-                LStock = LStock + StockCode + ','
-                count = count +1
-        if(rate == 1):
-            if(Score =='A+') or (Score =='A') or (Score =='A-'):
-                StockCode = sht.Cells(i,1).Value
-                LStock = LStock + StockCode + ','
-                count = count +1
-        i += 1
-    print('一共目标股票数量：', count)
-    return LStock
+    return
 
+def ExcelMain():
+    global sht
+    sht = GetExcelSht()
+    priceI = findCol("price")
+    difI = findCol("dif")
+    print(priceI)
+    LoopCol(priceI)
+    return
 
-#----------主程序
-LStock = Filter(1)
-path = r'C:\Users\Administrator\Desktop\股票\ListStock.py'
-with open(path, 'w') as f:
-    f.write(str(LStock))
+def Core(p):
+    if len(priceL) <3:
+        priceL.append(p)
+        return
+    for target_list in expression_list:
+        pass
+
+def test():
+    priceSet = ([1, 2, 3])
+    # print(priceSet[1] = 10)
+    print(priceSet)
     
+#----------主程序
+# ExcelMain()
+test()
+
+
+
+
+
+
+
+
 
 #Workbooks.Open 打开
 #Workbooks.Add()  #新增 返回一个Workbook
@@ -44,7 +69,7 @@ with open(path, 'w') as f:
 ##.Save
 ##.Close
 ##sht = self.xlBook.Worksheets(sheet) 
-##sht.Cells(row, col).Value
+##
 ##
 ##sht.Range(sht.Cells(row1, col1), sht.Cells(row2, col2)).Value  区域
 

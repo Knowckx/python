@@ -15,8 +15,9 @@ class TickerTest(TickerHandlerBase):
                 return RET_OK, data
 
 def SeeTicker(data = None):
-    tickL = [data['price'][0],data['volume'][0],data['ticker_direction'][0]]
-    print(tickL,data.shape[0])
+    print(data)
+    # tickL = [data['time'][0],data['price'][0],data['volume'][0],data['ticker_direction'][0]]
+    # print(tickL,data.shape[0])
 
 
 class OrderBookTest(OrderBookHandlerBase):
@@ -51,7 +52,7 @@ handler1 = TickerTest()
 quote_ctx.set_handler(handler1)
 quote_ctx.subscribe([StockID], [SubType.TICKER])
 
-handler = OrderBookTest()
-quote_ctx.set_handler(handler)
-quote_ctx.subscribe([StockID], [SubType.ORDER_BOOK])
+# handler = OrderBookTest()
+# quote_ctx.set_handler(handler)
+# quote_ctx.subscribe([StockID], [SubType.ORDER_BOOK])
 
