@@ -1,9 +1,6 @@
 import win32com.client
 
 
-sht = 0
-priceL = []
-
 
 
 #----------操作Excel表
@@ -30,21 +27,7 @@ def LoopCol(colI=1):
             break
     return
 
-def ExcelMain():
-    global sht
-    sht = GetExcelSht()
-    priceI = findCol("price")
-    difI = findCol("dif")
-    print(priceI)
-    LoopCol(priceI)
-    return
 
-def Core(p):
-    if len(priceL) <3:
-        priceL.append(p)
-        return
-    for target_list in expression_list:
-        pass
 
 def test():
     priceSet = ([1, 2, 3])
@@ -53,7 +36,7 @@ def test():
     
 #----------主程序
 # ExcelMain()
-test()
+# test()
 
 
 
