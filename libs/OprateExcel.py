@@ -1,8 +1,5 @@
 import win32com.client
 
-
-
-
 #----------操作Excel表
 def GetExcelSht(index=0):
     o = win32com.client.Dispatch("Excel.Application") #抓到Excel进程

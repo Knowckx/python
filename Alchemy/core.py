@@ -1,8 +1,7 @@
 # from libs import FileRW
 from libs.excel import PDReadExcel
 
-sht = 0
-print("32131")
+sht = 0 #该页的excel对象
 
 # def main():
 #     global sht
