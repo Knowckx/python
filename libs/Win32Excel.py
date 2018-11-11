@@ -1,10 +1,19 @@
 import win32com.client
 
+sht = 0
+priceI = 0
+difI = 0
+
+
+
 #----------操作Excel表
-def GetExcelSht(index=0):
+def InitExcelSht(index=0):
+    global sht,priceI,difI
     o = win32com.client.Dispatch("Excel.Application") #抓到Excel进程
     o.Visible = 1
     sht = o.Worksheets[index]
+    priceI = findCol("price")
+    difI = findCol("dif")
     return sht
 
 def findCol(tar =""):
@@ -14,15 +23,23 @@ def findCol(tar =""):
     print("can't find target col")
     return -1
     	
-def LoopCol(colI=1):
-    i=0
+def LoopCol(func,colI=1,):
+    colI = priceI
+    i=1
     while True:
         i = i + 1
+        print(i)
         prc = sht.Cells(i,colI).Value
-        print(i,prc)
         if prc == None or prc == "":
             break
+        # print(i,prc)
+        c = func(float(prc))
+        SetTag(i,c)
     return
+
+def SetTag(i,c):
+    sht.Cells(i,difI).Value = c
+
 
 
 
@@ -77,14 +94,7 @@ def test():
 ##    def close(self): 
 ##        self.xlBook.Close(SaveChanges=0) 
 ##        del self.xlApp 
-##    def getCell(self, sheet, row, col): 
-##        "Get value of one cell" 
-##        sht = self.xlBook.Worksheets(sheet) 
-##        return sht.Cells(row, col).Value 
-##    def setCell(self, sheet, row, col, value): 
-##        "set value of one cell" 
-##        sht = self.xlBook.Worksheets(sheet) 
-##        sht.Cells(row, col).Value = value 
+
 ##    def getRange(self, sheet, row1, col1, row2, col2): 
 ##        "return a 2d array (i.e. tuple of tuples)" 
 ##        sht = self.xlBook.Worksheets(sheet) 
