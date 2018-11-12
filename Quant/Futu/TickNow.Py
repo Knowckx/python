@@ -48,7 +48,7 @@ def SeeBookSimple(data):
     recordData(s)
     
 
-StockID = 'HK.03616'
+StockID = 'HK.01835'
 
 quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
 
