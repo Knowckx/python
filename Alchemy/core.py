@@ -9,9 +9,6 @@ PL3 = [] #3数的数组
 
 
 
-
-
-
 # 传入最近的tick
 def Core(p):
     Record(p)

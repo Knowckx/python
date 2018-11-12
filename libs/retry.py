@@ -15,7 +15,7 @@ def TryFunc(func , *args ,**kw ):
                 raise (e)
                 return False
     return re
-
+    
 
 def TestA(a):
     print("text123" + str(a))
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # oo = Test(1)
     
     
-
+    
 
 
 

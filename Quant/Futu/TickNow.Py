@@ -1,6 +1,8 @@
 import time
 from futuquant import *
+from libs import FileRW
 
+StockID = ''
 AskL = []
 BidL = []
 tickL = []
@@ -14,8 +16,14 @@ class TickerTest(TickerHandlerBase):
                 SeeTicker(data)
                 return RET_OK, data
 
+
+def recordData(data):
+    fPath = 'Docs/' + StockID + '.txt'
+    FileRW.Afile(fPath,str(data)+"\n")
+
 def SeeTicker(data = None):
     print(data)
+    recordData(data)
     # tickL = [data['time'][0],data['price'][0],data['volume'][0],data['ticker_direction'][0]]
     # print(tickL,data.shape[0])
 
@@ -35,16 +43,13 @@ class OrderBookTest(OrderBookHandlerBase):
 def SeeBookSimple(data):
     AskL = data['Ask']
     BidL = data['Bid']
-    print("%s,%s,%s" % (BidL[0:3][::-1]," ",AskL[0:3])) 
+    s ="%s,%s,%s" % (BidL[0:3][::-1]," ",AskL[0:3])
+    print(s) 
+    recordData(s)
     
-def Print1(tick = None):
-    if tick == None:
-        print("%s,%s,%s" % (BidL[0:3][::-1]," ",AskL[0:3])) 
-        return
-    # print("%s,%s,%s" % (BidL[0:3][::-1],tickL[:],AskL[0:3]))
-    print("%s" % (BidL))     
 
-StockID = 'HK.08259'
+StockID = 'HK.03616'
+
 quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
 
 
@@ -52,7 +57,7 @@ handler1 = TickerTest()
 quote_ctx.set_handler(handler1)
 quote_ctx.subscribe([StockID], [SubType.TICKER])
 
-# handler = OrderBookTest()
-# quote_ctx.set_handler(handler)
-# quote_ctx.subscribe([StockID], [SubType.ORDER_BOOK])
+handler = OrderBookTest()
+quote_ctx.set_handler(handler)
+quote_ctx.subscribe([StockID], [SubType.ORDER_BOOK])
 
