@@ -51,7 +51,6 @@ def CheckRetCode(ret_code):
         sys.exit()
 
 
-
 def recordData(data, SID):
     fPath = 'Docs/csv/' + SID + '.csv'
     data.to_csv(fPath, mode='a')
