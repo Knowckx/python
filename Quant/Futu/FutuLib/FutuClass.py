@@ -24,6 +24,5 @@ class OrderBookTest(OrderBookHandlerBase):
         if ret_code != RET_OK:
             print("OrderBookTest: error, msg: %s" % data)
             return RET_ERROR, data
-        # print("OrderBookTest ", data) # OrderBookTest自己的处理逻辑
         self.HandlerFunc(data)
         return RET_OK, data

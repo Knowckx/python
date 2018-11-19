@@ -8,8 +8,6 @@ def GetLotSize(SID):
     return lotsize
 
 
-
-
 # 清理一下Book的数据，主要是volum转lots
 def CleanBookData(BookMap):
     SID = BookMap["code"]
@@ -34,10 +32,8 @@ def CleanTickerData(data):
     SID = data["code"][0]
     size = GetLotSize(SID)
     data['volume'] = data['volume'].map(lambda x: int(x/size))
-
-    # print(type(data['time'][0])) #这个时间的处理
+    data['time'] = data['time'].map(lambda x: x[-8：])  # 2018-11-19 15:59:59
 
     data = data[['price', 'volume', 'ticker_direction', 'time']]
     data = data.rename(columns={'ticker_direction': 'type','volume': 'lots'})
-
     return data
