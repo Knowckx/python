@@ -41,8 +41,9 @@ def HandleBook(data):
 def HandleTicker(data=None):
     SID = data["code"][0]
     data = FutuUtil.CleanTickerData(data)
-    if data["lots"][0] > 5:
-        print(data)
+    # if data["lots"][0] > 5:
+    #     print(data)
+    print(data)
     recordData(data, SID)
 
 def CheckRetCode(ret_code):
