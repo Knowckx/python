@@ -32,7 +32,7 @@ def CleanTickerData(data):
     SID = data["code"][0]
     size = GetLotSize(SID)
     data['volume'] = data['volume'].map(lambda x: int(x/size))
-    data['time'] = data['time'].map(lambda x: x[-8：])  # 2018-11-19 15:59:59
+    data['time'] = data['time'].map(lambda x: x[-8:])  # 2018-11-19 15:59:59
 
     data = data[['price', 'volume', 'ticker_direction', 'time']]
     data = data.rename(columns={'ticker_direction': 'type','volume': 'lots'})
