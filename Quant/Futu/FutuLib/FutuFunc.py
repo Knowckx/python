@@ -2,6 +2,7 @@
 from . import FutuUtil,FutuClass
 from . import calc
 from futuquant import *
+from libs import date
 
 
 quote_ctx = 1  # 全局的连接上下文
@@ -53,6 +54,9 @@ def CheckRetCode(ret_code):
 
 
 def recordData(data, SID):
-    fPath = 'Docs/csv/' + SID + '.csv'
+    stoday = date.SGetTodayMD()
+    fPath = 'Docs/csv/' + SID +'_'+ stoday + '.csv'
     data.to_csv(fPath, mode='a')
     # FileRW.Afile(fPath, str(data)+"\n")
+
+time.__name__

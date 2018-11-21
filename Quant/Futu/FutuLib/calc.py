@@ -6,13 +6,13 @@ def GetPriceNow(bookN):
     AskL = bookN['Ask']
     BidL = bookN['Bid']
     P0 = GetBan(AskL[0], BidL[0])
-    P1 = GetBan(AskL[0], BidL[0])
-    P2 = GetBan(AskL[0], BidL[0])
+    P1 = GetBan(AskL[1], BidL[1])
+    P2 = GetBan(AskL[2], BidL[2])
     if P1 == -1:
         P1 = P0
     if P2 == -1:
         P2 = P0
-    rst = 0.75*P0 + 0.15*P1 + 0.1*P2
+    rst = 0.7*P0 + 0.2*P1 + 0.1*P2
     rst = round(rst, 5)
     return rst
 
