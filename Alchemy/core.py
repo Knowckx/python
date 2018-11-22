@@ -1,6 +1,6 @@
 # from libs import FileRW
 import libs.Win32Excel as ex
-import list
+import listP
 
 p = 0 #最近的new tick
 ntCnt = 0 #已经传入多少次tick了
@@ -16,7 +16,7 @@ def Core(p):
         initPL3()
         return 0
     rst = dealPL3()
-    print('List status：',PL3)
+    print('listP status：',PL3)
     return rst
     # for p in PL3:
     #     pass
@@ -53,14 +53,14 @@ def dealPL3():
     if p > max(PL3):
         print('新高')
         if len(PL3)==3:
-            list.DelMin(PL3)
+            listP.DelMin(PL3)
         PL3.append(p)
         flag = 10
         return flag
     if p<min(PL3):
         print('新低')
         if len(PL3)==3:
-            list.DelMax(PL3)
+            listP.DelMax(PL3)
         PL3.append(p)
         flag = -10
         return flag

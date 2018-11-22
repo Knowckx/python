@@ -11,6 +11,13 @@
             "program": "${file}"
         },
         {
+            "name": "BookNow",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/Quant/Futu/TickNow.Py"
+        },
+
+        {
             "name": "Python: Attach",
             "type": "python",
             "request": "attach",

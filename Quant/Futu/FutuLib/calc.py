@@ -2,9 +2,7 @@
 from . import FutuUtil
 
 
-def GetPriceNow(bookN):
-    AskL = bookN['Ask']
-    BidL = bookN['Bid']
+def GetPriceNow(AskL,BidL):
     P0 = GetBan(AskL[0], BidL[0])
     P1 = GetBan(AskL[1], BidL[1])
     P2 = GetBan(AskL[2], BidL[2])

@@ -1,6 +1,6 @@
 
-from . import FutuUtil,FutuClass
-from . import calc
+from . import FutuUtil, FutuClass
+from . import calc, CBook
 from futuquant import *
 from libs import date
 
@@ -19,26 +19,28 @@ def InitBasic(SID):
     CheckRetCode(ret_code)
     FutuUtil.SMap[SID] = data
 
+
 def Subs(SID):
-    tickHandler = FutuClass.TickerTest(HandleTicker) # 为了回调
+    tickHandler = FutuClass.TickerTest(HandleTicker)  # 为了回调
     bookhandler = FutuClass.OrderBookTest(HandleBook)
     quote_ctx.set_handler(tickHandler)
     quote_ctx.set_handler(bookhandler)
-    quote_ctx.subscribe([SID], [SubType.ORDER_BOOK,SubType.TICKER])
+    quote_ctx.subscribe([SID], [SubType.ORDER_BOOK, SubType.TICKER])
 
 # 回调 摆盘
+
+
 def HandleBook(data):
     data = FutuUtil.CleanBookData(data)
+    nb = CBook.Book(data)
+    df = nb.ToDF()
+    print(df)
     SID = data["code"]
-    AskL = data['Ask'][0:5]
-    BidL = data['Bid'][0:5]
-    priceN = calc.GetPriceNow(data)
-    s = "%s,%s,%s" % (BidL[0:5][::-1], priceN, AskL[0:5])
-    print(s)
-    df = pd.DataFrame({'BookList': [s]})
     recordData(df, SID)
 
 # 回调 Ticker
+
+
 def HandleTicker(data=None):
     SID = data["code"][0]
     data = FutuUtil.CleanTickerData(data)
@@ -46,6 +48,7 @@ def HandleTicker(data=None):
     #     print(data)
     print(data)
     recordData(data, SID)
+
 
 def CheckRetCode(ret_code):
     if ret_code != RET_OK:
@@ -55,8 +58,9 @@ def CheckRetCode(ret_code):
 
 def recordData(data, SID):
     stoday = date.SGetTodayMD()
-    fPath = 'Docs/csv/' + SID +'_'+ stoday + '.csv'
+    fPath = 'Docs/csv/' + SID + '_' + stoday + '.csv'
     data.to_csv(fPath, mode='a')
     # FileRW.Afile(fPath, str(data)+"\n")
+
 
 time.__name__
