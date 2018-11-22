@@ -9,6 +9,7 @@ def StartStockTick(SID):
     FutuFunc.InitBasic(SID)
     FutuFunc.Subs(SID)
 
+
 def Main():
     FutuFunc.Init()
     # StockID = 'HK.02258'
