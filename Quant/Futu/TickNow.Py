@@ -14,7 +14,9 @@ def Main():
     FutuFunc.Init()
     # StockID = 'HK.02258'
     # StartStock(quote_ctx, StockID)
-    StockID = 'HK.06890'
+    # StockID = 'HK.06890'
+    StockID = 'HK.00780'
+
     StartStockTick(StockID)
 
 
