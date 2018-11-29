@@ -12,9 +12,8 @@ def InitExcelSht(index=0):
     o = win32com.client.Dispatch("Excel.Application") #抓到Excel进程
     o.Visible = 1
     sht = o.Worksheets[index]
-    priceI = findCol("price")
-    difI = findCol("dif")
     return sht
+
 
 def findCol(tar =""):
     for i in range(1,100):
