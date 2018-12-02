@@ -8,24 +8,6 @@ BidL1 = []
 AskL2 = []
 BidL2 = []
 
-def loopforDiv():
-    i = 0
-    while True:
-        i = i + 1
-        print(i)
-        prc = sht.Cells(i, 4).Value
-        print(prc)
-        if prc == None or prc == "":
-            break
-
-        if str(prc).find("[") > -1 or prc == "BookList":
-            sht.Cells(i, 10).Value = prc
-            sht.Cells(i, 4).Value = None
-            print(prc)
-        print(i, prc)
-    return
-
-
 # com操作excel
 
 # 形态
@@ -58,53 +40,31 @@ def GetBookEx(row,col):
     return BidL,AskL
 
 
-
+#盘口变化
 def main():
     global sht,AskL1,BidL1,AskL2,BidL2
     sht = ex.InitExcelSht()
 
     i = 1
+    k = 0 #lastL
     while True:
         i = i + 1
         prc = sht.Cells(i, 2).Value
         print(i,prc)
 
-        if i >= 109:
-            print(i,prc)
-
-
-        if prc == None or prc == "" or i >= 510:
+        if prc == None or prc == "":
             break
         if prc == "BookList":
             i = i + 1
             if len(AskL1)==0:
                 BidL1,AskL1 = GetBookEx(i,2)
-            elif len(AskL2)==0:
-                BidL2,AskL2 = GetBookEx(i,2)
+                k = i
             else:
-                BidL1,AskL1 = BidL2,AskL2
                 BidL2,AskL2 = GetBookEx(i,2)
                 rstDiff = bookdiff.Start(AskL1,BidL1,AskL2,BidL2)
-                sht.Cells(i, 14).Value = str(rstDiff)
+                sht.Cells(k, 14).Value = str(rstDiff)
+                k = i
+                BidL1,AskL1 = BidL2,AskL2
+main()
 
 
-def analy():
-    global sht
-    sht = ex.InitExcelSht()
-    coreCol = 7
-    i = 0
-    while True:
-        i = i + 1
-        prc = sht.Cells(i, 2).Value
-        print(i,prc)
-        if prc == None or prc == "" or i >= 1000:
-            break
-        if prc == "BookList":
-            i = i + 1
-            vv = sht.Cells(i, coreCol).Value
-            extremum.PutNewV(vv,i)
-    
-    extremum.DumpHisty()
-# main()
-
-analy()

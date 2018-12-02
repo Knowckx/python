@@ -49,7 +49,9 @@ def diffAskL(AskL1,AskL2):
 def addbuyR(BidL1,BidL2,mode=1):
     for i in range(0,5):
         if BidL2[i][0] != BidL1[0][0]:
-            DifApd(*BidL2[i])
+            prc = BidL2[i][0]
+            lots = BidL2[i][1] * (-1)
+            DifApd(prc,lots)
             continue
         DifSames(BidL1,BidL2[i:],mode)
         break
