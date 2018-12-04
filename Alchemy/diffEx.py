@@ -20,7 +20,7 @@ def GetPAL(ss):
     rs = str(ss).partition(",")
     ut = []
     ut.append(float(rs[0]))
-    ut.append(float(rs[2]))
+    ut.append(int(rs[2]))
     return ut
 
 def GetBookEx(row,col):
@@ -62,7 +62,7 @@ def main():
             else:
                 BidL2,AskL2 = GetBookEx(i,2)
                 rstDiff = bookdiff.Start(AskL1,BidL1,AskL2,BidL2)
-                sht.Cells(k, 14).Value = str(rstDiff)
+                sht.Cells(k, 17).Value = str(rstDiff)
                 k = i
                 BidL1,AskL1 = BidL2,AskL2
 main()
