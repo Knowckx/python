@@ -5,75 +5,111 @@ DiffL = []
 
 
 # 基础 确定是diff 加入
-def DifApd(difP,difLots):
-    for dif in DiffL:
-        if dif[0] == difP:
-            dif[1] = dif[1]+difLots
-            return
+def DifApd(difP,difLots,check = False):
+    if check:
+        for dif in DiffL:
+            if dif[0] == difP:
+                dif[1] = dif[1]+difLots
+                return
     DiffL.append([difP,difLots])
 
-# 同价单位，比较量是否有变化
-def DifSame(L1,L2,mode=1):
-    if(L1[0] != L2[0]):
-        print("Need Same Price",L1[0],L2[0])
-        return
-    if(L1[1] == L2[1]):
-        return
-    difPrice = L2[0] 
-    difLots = (L2[1] - L1[1])*mode
-    DifApd(difPrice,difLots)
-
-# 同价对比
-def DifSames(L1,L2,mode=1):
-    for i in range(0,len(L2)):
-        DifSame(L1[i],L2[i],mode)
-
-def diffBidL(BidL1,BidL2):
-    if BidL1[0][0] == BidL2[0][0]: #平盘
-        DifSames(BidL1,BidL2)
-    elif BidL1[0][0] < BidL2[0][0]: #buy,右移
-        addbuyR(BidL1,BidL2)
-    elif BidL1[0][0] > BidL2[0][0]: #sell,左移
-        addbuyR(BidL2,BidL1,-1)
-
-def diffAskL(AskL1,AskL2):
-    if AskL1[0][0] == AskL2[0][0]: #平盘
-        DifSames(AskL1,AskL2,-1)
-    elif AskL1[0][0] < AskL2[0][0]: #卖盘,右移
-        addbuyR(AskL2,AskL1)
-    elif AskL1[0][0] > AskL2[0][0]: #卖盘,左移
-        addbuyR(AskL1,AskL2,-1)
-
-
-
-def addbuyR(BidL1,BidL2,mode=1):
-    for i in range(0,5):
-        if BidL2[i][0] != BidL1[0][0]:
-            prc = BidL2[i][0]
-            lots = BidL2[i][1]*mode
-            DifApd(prc,lots)
+    
+# 两个L对比，L头相同
+#   4 5 6 |  7 8 9
+# 3 4 5   |    8 9 10
+def DifSames(L1,L2,gap=0,flag=-1):
+    minL = len(L1)
+    if len(L2) < minL:
+        minL = len(L2)
+    start = flag*(11+gap)
+    for i in range(0,minL):
+        if(L1[i][1] == L2[i][1]):
             continue
-        DifSames(BidL1,BidL2[i:],mode)
-        break
+        difPrice = start+i*flag
+        difLots = (L2[i][1] - L1[i][1])*(-1)*flag
+        DifApd(difPrice,difLots)
+
+def diffList(BidL1,AskL1,BidL2,AskL2):
+    flag = -1
+    if BidL1[0][0] == BidL2[0][0]: #平盘
+        DifSames(BidL1,BidL2,flag = flag)
+    elif BidL1[0][0] > BidL2[0][0]: #sell,左移
+        addOutwardL(BidL1,BidL2,flag = flag)
+    elif BidL1[0][0] < BidL2[0][0]: #buy,右移
+        addInwardL(BidL1,BidL2,stad = AskL1[0][0],flag = flag)
+
+
+    flag = 1
+    if AskL1[0][0] == AskL2[0][0]: #平盘
+        DifSames(AskL1,AskL2,flag = flag)
+    elif AskL1[0][0] < AskL2[0][0]: #卖盘,右移
+        addOutwardL(AskL1,AskL2,flag = flag)
+    elif AskL1[0][0] > AskL2[0][0]: #卖盘,左移
+        addInwardL(AskL1,AskL2,stad = BidL1[0][0],flag = flag)
+
+# L2的头部多了几个数    L2新出现的6,7不能确定真实相对名
+# 3 4 5   |    8 9 10
+#   4 5 6 |  7 8 9 
+def addInwardL(L1,L2,stad = 0,flag=-1):
+    gap = getGap(L2,L1)
+    DifSames(L1,L2[gap:],gap = 0,flag=flag)
+    k = 0 
+    for i in range(0,gap):
+        cur = L2[gap-i-1]
+        if (flag < 0 and cur[0] < stad) or (flag > 0 and cur[0] > stad):
+            difPrice = (9-i)*flag
+            lots = cur[1]*flag*(-1)
+            DifApd(difPrice,lots)
+            continue
+        difPrice = (11+k)*flag*(-1)
+        lots = cur[1]*flag*(-1)
+        DifApd(difPrice,lots,check=True)
+        k = k + 1 
+
+
+# L1的头部多了几个数  L1在里，L2向外
+#   4 5 6 |  7 8 9
+# 3 4 5   |    8 9 10
+# flag bid=-1 ask=1 
+def addOutwardL(L1,L2,flag=-1):
+    #第几个数才相等？
+    gap = getGap(L1,L2)
+    DifSames(L1[gap:],L2,gap=gap,flag=flag)
+    #头部数的处理
+    for i in range(0,gap):
+        difPrice = (11+i)*flag
+        lots = L1[i][1]*flag
+        DifApd(difPrice,lots,check = True)
+
+# L1的前位置多出数来 L1[2] = L2[0]
+def getGap(L1,L2):
+    #第几个数才相等？
+    gap = 0
+    for i in range(0,len(L1)):
+        if L1[i][0] == L2[0][0]: #以L1头部为标准
+            gap = i
+            break
+    return gap
+
 
 def SortDiffL(ut):
     return ut[0]
 
 
 
-def Replace(BidL,AskL):
-    for i in range(0,5):
-        BidL[i][0] = (i+1)*(-1) 
-        AskL[i][0] = i+1
+# def Replace(BidL,AskL):
+#     for i in range(0,5):
+#         BidL[i][0] = (i+1)*10*(-1) 
+#         AskL[i][0] = (i+1)*10
+
 
 
 def Start(AskL1,BidL1,AskL2,BidL2):
     global DiffL
-    Replace(BidL1,AskL1)
-    Replace(BidL2,AskL2)
+    # Replace(BidL1,AskL1)
+    # Replace(BidL2,AskL2)
     DiffL = []
-    diffBidL(BidL1,BidL2)
-    diffAskL(AskL1,AskL2)
+    diffList(BidL1,AskL1,BidL2,AskL2)
     DiffL.sort(key=SortDiffL)
     return DiffL
 

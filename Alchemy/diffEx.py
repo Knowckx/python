@@ -46,6 +46,8 @@ def main():
     sht = ex.InitExcelSht()
 
     i = 1
+    # i = 3145
+
     k = 0 #lastL
     while True:
         i = i + 1
@@ -66,5 +68,6 @@ def main():
                 k = i
                 BidL1,AskL1 = BidL2,AskL2
 main()
+
 
 
