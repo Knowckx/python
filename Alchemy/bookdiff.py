@@ -96,13 +96,20 @@ def SortDiffL(ut):
     return ut[0]
 
 
-
-# def Replace(BidL,AskL):
-#     for i in range(0,5):
-#         BidL[i][0] = (i+1)*10*(-1) 
-#         AskL[i][0] = (i+1)*10
-
-
+# screen
+def ScreenRst(DiffL):
+    limit = 5
+    for dif in DiffL[:]:
+        if  (-11 <=dif[0] <= 11):
+            if -5 < dif[1] < 5:
+                DiffL.remove(dif)
+        elif (dif[0] == -12 or dif[0] == 12):
+            if -10 < dif[1] < 10:
+                DiffL.remove(dif)
+        elif (dif[0] < -12 or dif[0] > 12):
+            if -20 < dif[1] < 20:
+                DiffL.remove(dif)
+    return DiffL
 
 def Start(AskL1,BidL1,AskL2,BidL2):
     global DiffL
@@ -111,6 +118,8 @@ def Start(AskL1,BidL1,AskL2,BidL2):
     DiffL = []
     diffList(BidL1,AskL1,BidL2,AskL2)
     DiffL.sort(key=SortDiffL)
+
+    DiffL = ScreenRst(DiffL)
     return DiffL
 
 def GetLists():

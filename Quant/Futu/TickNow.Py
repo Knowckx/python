@@ -12,7 +12,7 @@ def StartStockTick(SID):
 
 def Main():
     FutuFunc.Init()
-    StockID = 'HK.01119'  #达力环保
+    StockID = 'HK.02168'  #创梦
 
     StartStockTick(StockID)
 
