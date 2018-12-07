@@ -13,6 +13,9 @@ def getMidMeanFromList(Li):
     TotalP = 0
     TotalLots = 0
     for i in range(0,3):
-        TotalP = TotalP + Li[i][0]*Li[i][1]
-        TotalLots = TotalLots + Li[i][1]
+        if Li[i][1] == 0:
+            continue
+        theLots = 1/Li[i][1]
+        TotalLots = TotalLots + theLots
+        TotalP = TotalP + Li[i][0]*theLots
     return TotalP,TotalLots
