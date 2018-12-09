@@ -96,7 +96,7 @@ def SortDiffL(ut):
     return ut[0]
 
 
-# screen
+# 要不要对结果进行筛选
 def ScreenRst(DiffL):
     limit = 5
     for dif in DiffL[:]:
@@ -119,7 +119,7 @@ def Start(AskL1,BidL1,AskL2,BidL2):
     diffList(BidL1,AskL1,BidL2,AskL2)
     DiffL.sort(key=SortDiffL)
 
-    DiffL = ScreenRst(DiffL)
+    # DiffL = ScreenRst(DiffL)
     return DiffL
 
 def GetLists():

@@ -1,21 +1,58 @@
 
 # 根据盘面计算数据期望值
+# 重心价格是目前价格。
+# buy和sell之间是预测价格。
+def GetPredictP(AskL,BidL):
 
-def GetMeanPrice(AskL,BidL):
-    askP,askLots = getMidMeanFromList(AskL)
-    bidP,bidLots = getMidMeanFromList(BidL)
-
-    rPrs = (askP+bidP)/(askLots+bidLots)
-    rst = round(rPrs, 5)
+    total = 0
+    factor = [70,16,8,4,2]
+    for i in range(0,5):
+        bidl = [BidL[0][0],BidL[i][1]]
+        askl = [AskL[0][0],AskL[i][1]]
+        p = GetPredickt(bidl,askl)
+        # print(p,factor[i])
+        total = total + p*factor[i]/100
+    rst = round(total, 5)
     return rst
 
-def getMidMeanFromList(Li):
+
+
+# 算预测
+def GetPredickt(bidL,askL):
+    askP = askL[0]
+    bidP = bidL[0]
+    askLots = askL[1]
+    bidLots = bidL[1]
+    rPrs = (askP*bidLots+bidP*askLots)/(askLots+bidLots)
+    return rPrs
+
+def GetWeightedP(li):
+    totalLots = 0
+    desc = 2
+    for i in range(0,len(li)):
+        if i == 0:
+            factor = 4*2
+        elif i == 1:
+            factor = 2
+        factor = factor/desc #第一个是1，尾加是2
+        theLots = li[i][1]
+        # print(theLots,factor,theLots*factor)
+        totalLots = totalLots + theLots*factor
+    
+    return totalLots
+
+
+# 旧 算重心
+def getMeanFromList(Li):
+    index = 3
     TotalP = 0
     TotalLots = 0
-    for i in range(0,3):
+    for i in range(0,index):
         if Li[i][1] == 0:
             continue
-        theLots = 1/Li[i][1]
+        theP = Li[i][0]
+        theLots = Li[i][1]
+        TotalP = TotalP + theP*theLots
         TotalLots = TotalLots + theLots
-        TotalP = TotalP + Li[i][0]*theLots
-    return TotalP,TotalLots
+    MeanP = TotalP/TotalLots
+    return MeanP,TotalLots

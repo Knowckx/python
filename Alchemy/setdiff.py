@@ -1,5 +1,7 @@
 import libs.Win32Excel as ex
-import bookdiff,extremum
+from bookut import bookdiff,extremum
+from exut import booklist
+
 sht =1
 
 AskL1 = []
@@ -12,6 +14,7 @@ BidL2 = []
 def main():
     global sht,AskL1,BidL1,AskL2,BidL2
     sht = ex.InitExcelSht()
+    booklist.sht = sht
 
     i = 1
     # i = 3145
@@ -27,12 +30,13 @@ def main():
         if prc == "BookList":
             i = i + 1
             if len(AskL1)==0:
-                BidL1,AskL1 = GetBookEx(i,2)
                 k = i
+                BidL1,AskL1 = booklist.GetBookEx(k,2)
+                
             else:
-                BidL2,AskL2 = GetBookEx(i,2)
+                BidL2,AskL2 = booklist.GetBookEx(i,2)
                 rstDiff = bookdiff.Start(AskL1,BidL1,AskL2,BidL2)
-                sht.Cells(k, 17).Value = str(rstDiff)
+                sht.Cells(k, 14).Value = str(rstDiff)
                 k = i
                 BidL1,AskL1 = BidL2,AskL2
 

@@ -13,6 +13,7 @@ def setmean():
     sht = ex.InitExcelSht()
     booklist.sht = sht
     i = 1
+    # i = 732
     while True:
         i = i + 1
         prc = sht.Cells(i, 2).Value
@@ -22,7 +23,7 @@ def setmean():
         if prc == "BookList":
             i = i + 1
             BidL1,AskL1 = booklist.GetBookEx(i,2)
-            rst = mean.GetMeanPrice(AskL1,BidL1)
+            rst = mean.GetPredictP(AskL1,BidL1)
             sht.Cells(i, 7).Value = rst
 
 setmean()
