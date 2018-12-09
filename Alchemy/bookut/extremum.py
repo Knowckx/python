@@ -3,7 +3,7 @@
 # 判断最大最小值
 
 # amplitude 振幅   波谷到波峰为两倍的振幅。 1倍就可以确定是不是高点低点
-amplitude = 0.015
+amplitude = 0.11
 lastL = [-2,-2] # 还没有出现第一次极值  (v, -1 | +1)
 maxL = [-1,-1]
 minL = [-1,-1]
@@ -43,7 +43,6 @@ def IsExtm(mode=1):
     print(minL,maxL,histyL)
 
 def PutNewV(nv,idx):
-    # print(minL,maxL,histyL)
     if maxL[1] == -1:
         SetMax(nv,idx)
         SetMin(nv,idx)

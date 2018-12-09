@@ -15,7 +15,7 @@ def analy():
         # if prc == None or prc == "" or i >= 1000:
         if prc == None or prc == "":
             break
-        if prc == "BookList":
+        if prc == "Bid5":
             i = i + 1
             vv = sht.Cells(i, coreCol).Value
             print(i,vv)

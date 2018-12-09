@@ -27,7 +27,7 @@ def main():
 
         if prc == None or prc == "":
             break
-        if prc == "BookList":
+        if prc == "Bid5":
             i = i + 1
             if len(AskL1)==0:
                 k = i

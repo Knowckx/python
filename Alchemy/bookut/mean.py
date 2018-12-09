@@ -7,8 +7,14 @@ def GetPredictP(AskL,BidL):
     total = 0
     factor = [70,16,8,4,2]
     for i in range(0,5):
-        bidl = [BidL[0][0],BidL[i][1]]
-        askl = [AskL[0][0],AskL[i][1]]
+        blots = BidL[i][1]
+        alots = AskL[i][1]
+        if blots == 0:
+            blots =1
+        if AskL[i][1] == 0:
+            alots =1
+        bidl = [BidL[0][0],blots]
+        askl = [AskL[0][0],alots]
         p = GetPredickt(bidl,askl)
         # print(p,factor[i])
         total = total + p*factor[i]/100

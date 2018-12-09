@@ -20,7 +20,7 @@ def setmean():
         print(i,prc)
         if prc == None or prc == "":
             break
-        if prc == "BookList":
+        if prc == "Bid5":
             i = i + 1
             BidL1,AskL1 = booklist.GetBookEx(i,2)
             rst = mean.GetPredictP(AskL1,BidL1)
