@@ -111,15 +111,15 @@ def ScreenRst(DiffL):
                 DiffL.remove(dif)
     return DiffL
 
-def Start(AskL1,BidL1,AskL2,BidL2):
+def Start(AskL1,BidL1,AskL2,BidL2,Screen = 1):
     global DiffL
     # Replace(BidL1,AskL1)
     # Replace(BidL2,AskL2)
     DiffL = []
     diffList(BidL1,AskL1,BidL2,AskL2)
     DiffL.sort(key=SortDiffL)
-
-    # DiffL = ScreenRst(DiffL)
+    if Screen == 1:
+        DiffL = ScreenRst(DiffL)
     return DiffL
 
 def GetLists():
