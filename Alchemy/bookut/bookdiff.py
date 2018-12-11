@@ -106,8 +106,11 @@ def ScreenRst(DiffL):
         elif (dif[0] == -12 or dif[0] == 12):
             if -10 < dif[1] < 10:
                 DiffL.remove(dif)
-        elif (dif[0] < -12 or dif[0] > 12):
+        elif (dif[0] == -13 or dif[0] == 13):
             if -20 < dif[1] < 20:
+                DiffL.remove(dif)
+        elif (dif[0] < -13 or dif[0] > 13):
+            if -40 < dif[1] < 40:
                 DiffL.remove(dif)
     return DiffL
 

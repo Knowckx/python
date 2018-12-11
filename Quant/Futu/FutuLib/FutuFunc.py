@@ -21,6 +21,7 @@ def InitBasic(SID):
         Market.HK, SecurityType.STOCK, SID)
     CheckRetCode(ret_code)
     FutuUtil.SMap[SID] = data
+    print(SID,data["name"][0])
 
 
 def Subs(SID):
