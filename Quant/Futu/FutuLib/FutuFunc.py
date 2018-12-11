@@ -25,13 +25,12 @@ def InitBasic(SID):
 
 
 def Subs(SID):
-    # tickHandler = FutuClass.TickerTest(HandleTicker)  # 为了回调
-    # quote_ctx.set_handler(tickHandler)
-
+    tickHandler = FutuClass.TickerTest(HandleTicker)  # 为了回调
+    quote_ctx.set_handler(tickHandler)
     bookhandler = FutuClass.OrderBookTest(HandleBook)
     quote_ctx.set_handler(bookhandler)
-    quote_ctx.subscribe([SID], [SubType.ORDER_BOOK])
-    # quote_ctx.subscribe([SID], [SubType.ORDER_BOOK, SubType.TICKER])
+    # quote_ctx.subscribe([SID], [SubType.ORDER_BOOK])
+    quote_ctx.subscribe([SID], [SubType.ORDER_BOOK, SubType.TICKER])
 
 
 # 回调 摆盘

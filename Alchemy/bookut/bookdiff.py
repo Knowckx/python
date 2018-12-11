@@ -6,6 +6,8 @@ DiffL = []
 
 # 基础 确定是diff 加入
 def DifApd(difP,difLots,check = False):
+    if difLots == 0:
+        return
     if check:
         for dif in DiffL:
             if dif[0] == difP:

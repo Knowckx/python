@@ -35,7 +35,7 @@ def main():
                 
             else:
                 BidL2,AskL2 = booklist.GetBookEx(i,2)
-                rstDiff = bookdiff.Start(AskL1,BidL1,AskL2,BidL2)
+                rstDiff = bookdiff.Start(AskL1,BidL1,AskL2,BidL2,Screen=0)
                 sht.Cells(k, 14).Value = str(rstDiff)
                 k = i
                 BidL1,AskL1 = BidL2,AskL2
