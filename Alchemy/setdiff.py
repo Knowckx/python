@@ -17,7 +17,7 @@ def SetDiff():
     booklist.sht = sht
 
     i = 1
-    # i = 3145
+    # i = 3145 #debug
 
     k = 0 #lastL
     while True:
@@ -37,6 +37,13 @@ def SetDiff():
                 BidL2,AskL2 = booklist.GetBookEx(i,2)
                 rstDiff = bookdiff.Start(AskL1,BidL1,AskL2,BidL2,Screen=0)
                 sht.Cells(k, 14).Value = str(rstDiff)
+
+                DiffL = bookdiff.ScreenRst(rstDiff[:])
+                if len(DiffL) ==0:
+                    DiffL = None
+                else:
+                    DiffL = str(DiffL)
+                sht.Cells(k, 17).Value = DiffL
                 k = i
                 BidL1,AskL1 = BidL2,AskL2
 SetDiff()

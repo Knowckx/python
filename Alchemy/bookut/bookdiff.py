@@ -91,6 +91,7 @@ def getGap(L1,L2):
         if L1[i][0] == L2[0][0]: #以L1头部为标准
             gap = i
             break
+        gap = 5
     return gap
 
 
@@ -123,8 +124,8 @@ def Start(AskL1,BidL1,AskL2,BidL2,Screen = 1):
     DiffL = []
     diffList(BidL1,AskL1,BidL2,AskL2)
     DiffL.sort(key=SortDiffL)
-    if Screen == 1:
-        DiffL = ScreenRst(DiffL)
+    # if Screen == 1:
+    #     DiffL = ScreenRst(DiffL)
     return DiffL
 
 def GetLists():
