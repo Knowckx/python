@@ -11,7 +11,7 @@ AskL2 = []
 BidL2 = []
 
 #盘口变化
-def main():
+def SetDiff():
     global sht,AskL1,BidL1,AskL2,BidL2
     sht = ex.InitExcelSht()
     booklist.sht = sht
@@ -39,9 +39,7 @@ def main():
                 sht.Cells(k, 14).Value = str(rstDiff)
                 k = i
                 BidL1,AskL1 = BidL2,AskL2
-
-
-main()
+SetDiff()
 
 
 
