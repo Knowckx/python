@@ -43,10 +43,9 @@ def HandleBook(data):
     AskL1 = data["Ask"][:5]
     BidL1 = data["Bid"][:5]
     SID = data["code"]
-
-    print(df)
-    print("diff:",str(rstDiff))
-
+    #     print(df)
+    if rstDiff !="":
+        print(df['core'][0],"diff:",rstDiff)
     recordData(df, SID)
 
 
@@ -58,7 +57,7 @@ def HandleTicker(data=None):
     data = FutuUtil.CleanTickerData(data)
     # if data["lots"][0] > 5:
     #     print(data)
-    print(data)
+#     print(data)
     recordData(data, SID)
 
 

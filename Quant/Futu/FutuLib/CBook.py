@@ -23,9 +23,12 @@ class Book:
 
     def GetDiff(self,AskL1,BidL1):
         if len(AskL1) == 0:
-            return None
+            return ""
         rstDiff = bookdiff.Start(AskL1,BidL1,self.AskL[:5],self.BidL[:5])
-        return rstDiff
+        DiffL = bookdiff.ScreenRst(rstDiff[:])
+        if len(DiffL) ==0:
+            DiffL = ""
+        return DiffL
 
 def ListToStr(ins):
     for i in range(0, len(ins)):
