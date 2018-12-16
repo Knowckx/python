@@ -104,8 +104,9 @@ def ScreenRst(DiffL):
     limit = 5
     for dif in DiffL[:]:
         if  (-11 <=dif[0] <= 11):
-            if -5 < dif[1] < 5:
-                DiffL.remove(dif)
+            pass
+            # if -5 < dif[1] < 5:
+            #     DiffL.remove(dif)
         elif (dif[0] == -12 or dif[0] == 12):
             if -10 < dif[1] < 10:
                 DiffL.remove(dif)

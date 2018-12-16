@@ -3,7 +3,7 @@ from bookut import extremum
 sht = 1
 
 # 找大小值
-def extremum():
+def extremum1():
     global sht
     sht = ex.InitExcelSht()
     coreCol = 7
@@ -25,5 +25,5 @@ def extremum():
 
 
 
-analy()
+extremum1()
 
