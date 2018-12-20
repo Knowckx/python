@@ -8,7 +8,7 @@ class Book:
         self.SID = FutuBook["code"]
         self.AskL = FutuBook["Ask"]
         self.BidL = FutuBook["Bid"]
-        self.Mean = mean.GetPredictP(self.AskL[:5],self.BidL[:5])
+        self.Mean = mean.GetPredictP([self.BidL[:5],self.AskL[:5]])
 
     def ToDF(self):
         df = pd.DataFrame()

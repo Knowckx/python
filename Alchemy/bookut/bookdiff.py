@@ -2,7 +2,8 @@
 
 
 DiffL = []
-
+BidL1 = []
+AskL1 = []
 
 # 基础 确定是diff 加入
 def DifApd(difP,difLots,check = False):
@@ -31,7 +32,8 @@ def DifSames(L1,L2,gap=0,flag=-1):
         difLots = (L2[i][1] - L1[i][1])*(-1)*flag
         DifApd(difPrice,difLots)
 
-def diffList(BidL1,AskL1,BidL2,AskL2):
+def diffList(BidL2,AskL2):
+    global BidL1,AskL1
     flag = -1
     if BidL1[0][0] == BidL2[0][0]: #平盘
         DifSames(BidL1,BidL2,flag = flag)
@@ -118,24 +120,20 @@ def ScreenRst(DiffL):
                 DiffL.remove(dif)
     return DiffL
 
-def Start(AskL1,BidL1,AskL2,BidL2,Screen = 1):
-    global DiffL
-    # Replace(BidL1,AskL1)
-    # Replace(BidL2,AskL2)
+def Start(bookL,Screen = 0):
+    global AskL1,BidL1,DiffL
     DiffL = []
-    diffList(BidL1,AskL1,BidL2,AskL2)
+    if len(AskL1)==0: #init
+        BidL1,AskL1 = b[0],b[1]
+        return DiffL
+    diffList(bookL[0],bookL[1])
     DiffL.sort(key=SortDiffL)
+    BidL1,AskL1 = BidL2,AskL2 # reset
     # if Screen == 1:
     #     DiffL = ScreenRst(DiffL)
     return DiffL
 
-def GetLists():
-    AskL1,BidL1,AskL2,BidL2 = debugEx.main()
-    Start(AskL1,BidL1,AskL2,BidL2)
- 
 
-
-# GetLists()
 
 
                 

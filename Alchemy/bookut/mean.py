@@ -1,9 +1,8 @@
 
-# 根据盘面计算数据期望值
-# 重心价格是目前价格。
-# buy和sell之间是预测价格。
-def GetPredictP(AskL,BidL):
-
+# 给出盘面值
+def GetPredictP(book):
+    book[0] = BidL
+    book[1] = AskL
     total = 0
     factor = [70,16,8,4,2]
     for i in range(0,5):
@@ -11,11 +10,11 @@ def GetPredictP(AskL,BidL):
         alots = AskL[i][1]
         if blots == 0:
             blots =1
-        if AskL[i][1] == 0:
+        if alots == 0:
             alots =1
-        bidl = [BidL[0][0],blots]
+        bidl = [BidL[0][0],blots] #固定在盘口价来计算
         askl = [AskL[0][0],alots]
-        p = GetPredickt(bidl,askl)
+        p = getPredickt(bidl,askl)
         # print(p,factor[i])
         total = total + p*factor[i]/100
     rst = round(total, 5)
@@ -24,7 +23,7 @@ def GetPredictP(AskL,BidL):
 
 
 # 算预测
-def GetPredickt(bidL,askL):
+def getPredickt(bidL,askL):
     askP = askL[0]
     bidP = bidL[0]
     askLots = askL[1]

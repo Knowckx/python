@@ -42,12 +42,12 @@ def IsExtm(mode=1):
         SetMax(*minL)
     print(minL,maxL,histyL)
 
-def PutNewV(nv,idx):
+；def PutNewV(nv,idx):
     if maxL[1] == -1:
-        SetMax(nv,idx)
+        SetMax(nv,idx)  #init
         SetMin(nv,idx)
         return
-    if  minL[0] < nv < maxL[0]:
+    if  minL[0] < nv < maxL[0]:  #none
         return
     elif nv > maxL[0]:
         SetMax(nv,idx)

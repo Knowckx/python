@@ -4,8 +4,6 @@ sht = 0
 priceI = 0
 difI = 0
 
-
-
 #----------操作Excel表
 def InitExcelSht(index=0):
     global sht,priceI,difI

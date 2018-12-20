@@ -22,9 +22,9 @@ def setmean():
             break
         if prc == "Bid5":
             i = i + 1
-            BidL1,AskL1 = booklist.GetBookEx(i,2)
-            rst = mean.GetPredictP(AskL1,BidL1)
-            sht.Cells(i, 7).Value = rst
+            # BidL1,AskL1 = booklist.GetBookEx(i,2)  # update need
+            # rst = mean.GetPredictP(AskL1,BidL1)
+            # sht.Cells(i, 7).Value = rst
 
 setmean()
 
