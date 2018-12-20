@@ -39,12 +39,14 @@ def GetBookEx(row,col):
 def BookNext():
     global LoopIdx
     book = []
+    LoopIdx = LoopIdx - 1
     while True:
         LoopIdx = LoopIdx + 1
         prc = sht.Cells(LoopIdx, 2).Value
         if prc == None or prc == "":
-            return book
+            return book,LoopIdx
         if prc == "Bid5":
             LoopIdx = LoopIdx + 1
             book = GetBookEx(LoopIdx,2)
-            return book
+            return book,LoopIdx
+        

@@ -1,8 +1,8 @@
 
 # 给出盘面值
 def GetPredictP(book):
-    book[0] = BidL
-    book[1] = AskL
+    BidL = book[0]
+    AskL = book[1] 
     total = 0
     factor = [70,16,8,4,2]
     for i in range(0,5):

@@ -122,10 +122,12 @@ def ScreenRst(DiffL):
 
 def Start(bookL,Screen = 0):
     global AskL1,BidL1,DiffL
+    DiffL = []
     if len(AskL1)==0: #init
-        BidL1,AskL1 = b[0],b[1]
+        BidL1,AskL1 = bookL[0],bookL[1]
         return DiffL
-    diffList(bookL[0],bookL[1])
+    BidL2,AskL2 = bookL[0],bookL[1]
+    diffList(BidL2[:],AskL2[:])
     DiffL.sort(key=SortDiffL)
     BidL1,AskL1 = BidL2,AskL2 # reset
     # if Screen == 1:
