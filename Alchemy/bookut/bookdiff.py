@@ -122,7 +122,6 @@ def ScreenRst(DiffL):
 
 def Start(bookL,Screen = 0):
     global AskL1,BidL1,DiffL
-    DiffL = []
     if len(AskL1)==0: #init
         BidL1,AskL1 = b[0],b[1]
         return DiffL
