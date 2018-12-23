@@ -7,7 +7,10 @@ from core import core
 def Start():
     tCore = core.Core()
     ex.InitSht()
-    ex.LoopIdx = 20489 #dubug
+    # ex.LoopIdx = 20480 #dubug start
+    # ex.LoopIdx = 20522 #dubug
+    ex.LoopIdx = 20658 #dubug
+
 
     while True:
         bookL,i = ex.BookNext()
