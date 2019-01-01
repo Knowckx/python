@@ -1,4 +1,4 @@
-from bookut import bookdiff,mean
+from bookut import bookdiff,mean,utlist
 
 
 class Core:
@@ -11,72 +11,76 @@ class Core:
         pass
 
 
-    def PutNew(self, bookL):
-        prc = mean.GetPredictP(bookL[:])
-        dd = difToSignal(bookL[:])
-        # print(prc,dd)
+    def PutNew(self, bookL,i=-1):
+        self.NbookL = bookL
+        self.Nprc = mean.GetPredictP(bookL[:])
+        self.dif = difToSignal(bookL[:])
+        self.lmt = utlist.AvgLotL(bookL[:])*1.5
+        self.i = i
+        # print(prc,self.dif)
         # return
         if self.High == -1: #first
-            self.High = prc
-            self.Low = prc
+            self.High = self.Nprc
+            self.Low = self.Nprc
             return 
-        print('prc %s  his: %s %s'%(prc,self.Low,self.High))
-        if self.Low <= prc <= self.High:  #区间值
-            self.DealMid(dd,prc)
+        print('prc %s  his: %s %s'%(self.Nprc,self.Low,self.High))
+        if self.Low <= self.Nprc <= self.High:  #区间值
+            self.DealMid()
             return
-        elif prc < self.Low:  # 下破
-            self.DealLow(dd,prc)
+        elif self.Nprc < self.Low:  # 下破
+            self.OpenLow()
             return 
-        elif prc > self.High:
-            self.DealHigh(dd,prc)
+        elif self.Nprc > self.High:
+            self.OpenHigh()
             return
 
 
-    def DealLow(self,dd,prc):
+
+    def OpenLow(self):
         print("new Lower")
-        self.Low = prc
-        self.SignL.Reset()
+        self.SignL.Reset(self.i,self.lmt,)  # 重置低集
+        self.Low = self.Nprc # 低价 更新
         if self.CheckGap():
             self.High = self.Low + self.MaxGap
-        self.UpdateH(dd,prc)
 
-    def DealHigh(self,dd,prc):
+    def OpenHigh(self):
         print("new Higher")
-        self.High = prc
-        self.SignH.Reset()
+        self.SignH.Reset(self.i,self.lmt)  # 重置高集
+        self.High = self.Nprc
         if self.CheckGap():
             self.Low = self.High - self.MaxGap
-            print("reset LowV",self.Low)
-        self.UpdateL(dd,prc)
 
     # 区间值操作
-    def DealMid(self,dd,prc): 
+    def DealMid(self): 
         print("Mid")
-        self.UpdateH(dd,prc)
-        self.UpdateL(dd,prc)
+        self.UpdateH()
+        self.UpdateL()
  
-
-    def UpdateL(self,dd,prc):
-        print("try update Sign low")
-        if isZero(dd):
+    # 峰值，要不要buy?
+    def UpdateL(self):
+        if isZero(self.dif):
             return
-        ok,ss = self.SignL.Update(dd)
+        ok,ss = self.SignL.Update(self.dif)
+        if ss == '500': #Signal is Closed
+            return
+        print("try update Sign low")
         print("Sign Low:",ok,ss)
         if ok:
             self.SignL.Close()
-            self.SignH.Reset()
-            self.High = prc
+            self.OpenHigh()
 
-    def UpdateH(self,dd,prc):
-        print("try update Sign High")
-        if isZero(dd):
+    # 峰值，要不要sell?
+    def UpdateH(self):
+        if isZero(self.dif):
             return
-        ok,ss = self.SignH.Update(dd)
+        ok,ss = self.SignH.Update(self.dif)
+        if ss == '500': #Signal is Closed
+            return
+        print("try update Sign High")
         print("Sign High:",ok,ss)
         if ok:
             self.SignH.Close()
-            self.SignL.Reset()
-            self.Low = prc
+            self.OpenLow()
 
     def CheckGap(self):
         return self.Gap() > self.MaxGap
@@ -96,9 +100,11 @@ class Signal:
         self.Close()
         self.Flag = flag
 
-    def Reset(self):
+    def Reset(self,i=-1,maxLimit=15):
         self.VV = [0,0] 
         self.Open = True
+        self.CountLimit = maxLimit
+        self.i = i
     def Close(self):
         self.VV = [0,0] 
         self.Open = False
@@ -110,7 +116,7 @@ class Signal:
 
     def Update(self,dd):
         if not self.IsOpen():  #is close
-            return False,"Signal is Closed"
+            return False,"500"
         self.PrintNow()
         self.VV[0] = self.VV[0]+dd[0]
         self.VV[1] = self.VV[1]+dd[1]
@@ -122,7 +128,7 @@ class Signal:
         ask = self.VV[1]
         big = 0
         small = 0
-        if (bid + ask) < 15:
+        if (bid + ask) < self.CountLimit:  #self.CountLimit
             return  False,"Total Count not enough"
         if self.Flag > 0:  # 2是高位，big = ask
             big,small = ask,bid
@@ -139,11 +145,11 @@ def difToSignal(bookL):
     f = 0
     for dif in difL[:]:
         p,l = dif[0],dif[1]
-        if abs(p) >=11: #先确定系数
+        if abs(p) >11: #先确定系数
             cnt = abs(p) - 11
             f = 1/pow(2,cnt+1)
         else:
-            f = 1.2
+            f = 1
         vv = f*l #转换过来的数量
         if abs(vv) < 1 :
             continue

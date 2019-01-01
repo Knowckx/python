@@ -7,9 +7,9 @@ from core import core
 def Start():
     tCore = core.Core()
     ex.InitSht()
-    # ex.LoopIdx = 20480 #dubug start
+    ex.LoopIdx = 10152 #dubug start
     # ex.LoopIdx = 20522 #dubug
-    ex.LoopIdx = 20658 #dubug
+    # ex.LoopIdx = 20658 #dubug
 
 
     while True:
@@ -17,6 +17,6 @@ def Start():
         if len(bookL) == 0:
             return
         print("----- 行数",i)
-        tCore.PutNew(bookL)
+        tCore.PutNew(bookL,i)
 
 Start()
