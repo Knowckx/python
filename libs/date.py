@@ -17,3 +17,7 @@ def SGetTodayMD():
         SToday = datetime.date.today().strftime('%m-%d')
     return SToday
 
+def GetToday():
+    day = datetime.date.today().strftime('%Y-%m-%d')
+    return day
+print(GetToday())
