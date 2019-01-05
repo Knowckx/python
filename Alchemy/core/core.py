@@ -42,6 +42,7 @@ class Core:
         self.Low = self.Nprc # 低价 更新
         if self.CheckGap():
             self.High = self.Low + self.MaxGap
+        self.UpdateH()
 
     def OpenHigh(self):
         print("new Higher")
@@ -49,6 +50,7 @@ class Core:
         self.High = self.Nprc
         if self.CheckGap():
             self.Low = self.High - self.MaxGap
+        self.UpdateL()
 
     # 区间值操作
     def DealMid(self): 
@@ -121,7 +123,8 @@ class Signal:
         self.VV[0] = self.VV[0]+dd[0]
         self.VV[1] = self.VV[1]+dd[1]
         self.PrintNow()
-        return self.IsAction()
+        ok,detail = self.IsAction()
+        return ok,detail
 
     def IsAction(self):
         bid = self.VV[0]
@@ -131,11 +134,11 @@ class Signal:
         if (bid + ask) < self.CountLimit:  #self.CountLimit
             return  False,"Total Count not enough"
         if self.Flag > 0:  # 2是高位，big = ask
-            big,small = ask,bid
+            if ask >= abs(self.Flag)*bid:
+                return True,"Top! Sell!"
         if self.Flag < 0:
-            big,small = bid,ask
-        if big >= abs(self.Flag)*small:
-            return True,"gogogo"
+            if bid >= abs(self.Flag)*ask:
+                return True,"low! buy!"
         return False,"Not Ready"
         
 # book - bookdif - [+-11]上的变动
