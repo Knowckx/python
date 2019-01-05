@@ -1,29 +1,28 @@
-import libs.Win32Excel as ex
 from bookut import extremum
-sht = 1
+from exut import ex
 
-# 找大小值
+# 分析整个极值分布
 def extremum1():
-    global sht
+    ex.InitSht()
+    ex.LoopIdx = 3
+    while True:
+        bookL,i = ex.BookNext()
+        if len(bookL) == 0:
+            return
+        print("----- 行数",i)
+        ActionSetMean(bookL,i)
+
+def ActionSetMean(book,i):
+    rst = mean.GetPredictP(book)
+    ex.SetCell(i,7,rst)
+
+extremum1()
     sht = ex.InitExcelSht()
     coreCol = 7
     i = 0
-    while True:
-        i = i + 1
-        prc = sht.Cells(i, 2).Value
-        # print(i,prc)
-        # if prc == None or prc == "" or i >= 1000:
-        if prc == None or prc == "":
-            break
-        if prc == "Bid5":
-            i = i + 1
-            vv = sht.Cells(i, coreCol).Value
-            print(i,vv)
-            extremum.PutNewV(vv,i)
-    
-    extremum.DumpHisty()
 
 
 
-extremum1()
+
+
 

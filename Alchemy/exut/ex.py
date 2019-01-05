@@ -4,6 +4,10 @@ import libs.Win32Excel as ex
 sht = 1
 LoopIdx = 1
 
+def SetCell(i,v,rst):
+    global sht
+    sht.Cells(i, v).Value = rst
+
 def InitSht():
     global sht
     sht = ex.InitExcelSht()

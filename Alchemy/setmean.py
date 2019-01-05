@@ -1,30 +1,27 @@
-import libs.Win32Excel as ex
-from exut import booklist
+from exut import ex
 from bookut import mean
-sht =1
-
-AskL1 = []
-BidL1 = []
+from bookut import extremum
 
 
 # 期望值
 def setmean():
-    global sht,AskL1,BidL1
-    sht = ex.InitExcelSht()
-    booklist.sht = sht
-    i = 1
-    # i = 732
+    ex.InitSht()
+    ex.LoopIdx = 3
     while True:
-        i = i + 1
-        prc = sht.Cells(i, 2).Value
-        print(i,prc)
-        if prc == None or prc == "":
+        bookL,i = ex.BookNext()
+        if len(bookL) == 0:
             break
-        if prc == "Bid5":
-            i = i + 1
-            # BidL1,AskL1 = booklist.GetBookEx(i,2)  # update need
-            # rst = mean.GetPredictP(AskL1,BidL1)
-            # sht.Cells(i, 7).Value = rst
+        print("----- 行数",i)
+        Action(bookL,i)
+    extremum.DumpHisty()
+
+def Action(book,i):
+    rst = mean.GetPredictP(book)
+    # ex.SetCell(i,7,rst)
+
+    # vv = sht.Cells(i, coreCol).Value
+    vv = rst
+    extremum.PutNewV(vv,i)
 
 setmean()
 

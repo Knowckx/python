@@ -1,6 +1,19 @@
 
+# 有间隙的情况下，算站位的虚拟值
+def GetFixPrc(book):
+    BidL,AskL = book[0],book[1]
+    prcBid,prcAsk = BidL[0][0],AskL[0][0]   #目前的两边价格
+    StrdGap = prcBid - BidL[1][0]
+    if (prcAsk - prcBid) > StrdGap: #特殊情况
+        mid = (prcBid + prcAsk)/2
+        prcBid =  mid - StrdGap/2
+        prcAsk =  mid + StrdGap/2
+    return prcBid,prcAsk
+
+
 # 给出盘面值
 def GetPredictP(book):
+    prcBid,prcAsk = GetFixPrc(book[:])
     BidL = book[0]
     AskL = book[1] 
     total = 0
@@ -12,8 +25,8 @@ def GetPredictP(book):
             blots =1
         if alots == 0:
             alots =1
-        bidl = [BidL[0][0],blots] #固定在盘口价来计算
-        askl = [AskL[0][0],alots]
+        bidl = [prcBid,blots] #固定在盘口价来计算
+        askl = [prcAsk,alots]
         p = getPredickt(bidl,askl)
         # print(p,factor[i])
         total = total + p*factor[i]/100
