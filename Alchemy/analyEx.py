@@ -1,25 +1,22 @@
 from bookut import extremum
 from exut import ex
 
-# 分析整个极值分布
+# 分析极值分布
 def extremum1():
     ex.InitSht()
-    ex.LoopIdx = 3
+    ex.LoopIdx = 3500
+    extremum.amplitude = 0.01
     while True:
-        bookL,i = ex.BookNext()
-        if len(bookL) == 0:
+        vv,i = ex.BookSpeNext(7)
+        if vv == None or vv == '':
             return
         print("----- 行数",i)
-        ActionSetMean(bookL,i)
+        extremum.PutNewV(vv,i)
 
-def ActionSetMean(book,i):
-    rst = mean.GetPredictP(book)
-    ex.SetCell(i,7,rst)
-
+        if ex.LoopIdx >= 4682:
+            break
+    extremum.DumpHisty()
 extremum1()
-    sht = ex.InitExcelSht()
-    coreCol = 7
-    i = 0
 
 
 

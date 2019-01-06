@@ -19,7 +19,7 @@ def GetPAL(ss):
     ut.append(int(rs[2]))
     return ut
 
-# 拿到某行的book
+# 解析某行的book
 def GetBookEx(row,col):
     BidL = []
     AskL = []
@@ -53,4 +53,17 @@ def BookNext():
             LoopIdx = LoopIdx + 1
             book = GetBookEx(LoopIdx,2)
             return book,LoopIdx
-        
+
+def BookSpeNext(col):
+    global LoopIdx
+    book = []
+    LoopIdx = LoopIdx - 1
+    while True:
+        LoopIdx = LoopIdx + 1
+        prc = sht.Cells(LoopIdx, 2).Value
+        if prc == None or prc == "":
+            return book,LoopIdx
+        if prc == "Bid5":
+            LoopIdx = LoopIdx + 1
+            value = sht.Cells(LoopIdx, col).Value
+            return value,LoopIdx

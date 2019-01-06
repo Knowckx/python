@@ -107,6 +107,7 @@ class Signal:
         self.Open = True
         self.CountLimit = maxLimit
         self.i = i
+        self.Cnt = 0 # 目前记录的次数
     def Close(self):
         self.VV = [0,0] 
         self.Open = False
@@ -116,17 +117,22 @@ class Signal:
     def PrintNow(self):
         print("SignalStatus isopen:%s VV:%s"%(self.Open,self.VV))
 
+    def Add(self,dd):
+        self.VV[0] = self.VV[0]+dd[0]
+        self.VV[1] = self.VV[1]+dd[1]
+        self.Cnt = self.Cnt + 1
     def Update(self,dd):
         if not self.IsOpen():  #is close
             return False,"500"
         self.PrintNow()
-        self.VV[0] = self.VV[0]+dd[0]
-        self.VV[1] = self.VV[1]+dd[1]
+        self.Add(dd)
         self.PrintNow()
         ok,detail = self.IsAction()
         return ok,detail
 
     def IsAction(self):
+        if self.Cnt <= 2:
+            return  False,"Put Count not enough"
         bid = self.VV[0]
         ask = self.VV[1]
         big = 0

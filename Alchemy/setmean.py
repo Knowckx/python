@@ -8,11 +8,13 @@ def setmean():
     ex.InitSht()
     ex.LoopIdx = 3
     while True:
-        bookL,i = ex.BookNext()
-        if len(bookL) == 0:
-            break
-        print("----- 行数",i)
-        Action(bookL,i)
+        v,i = BookSpeNext(7)
+
+        # bookL,i = ex.BookNext()
+        # if len(bookL) == 0:
+        #     break
+        # print("----- 行数",i)
+        # Action(bookL,i)
     extremum.DumpHisty()
 
 def Action(book,i):
@@ -20,8 +22,7 @@ def Action(book,i):
     # ex.SetCell(i,7,rst)
 
     # vv = sht.Cells(i, coreCol).Value
-    vv = rst
-    extremum.PutNewV(vv,i)
+
 
 setmean()
 
