@@ -26,10 +26,12 @@ class Signal:
 
     def PrintNow(self):
         print("SignalStatus isopen:%s VV:%s"%(self.Open,self.VV))
+    
     def Add(self,dd):
         self.VV[0] = self.VV[0]+dd[0]
         self.VV[1] = self.VV[1]+dd[1]
         self.Cnt = self.Cnt + 1
+    
     def Update(self,dd):
         if not self.IsOpen():  #is close
             return False,"500"
@@ -39,7 +41,7 @@ class Signal:
         return self.IsAction()
 
     def IsAction(self):
-        if self.Cnt <= 2:
+        if self.Cnt <= 3:
             return  False,"Put Count not enough"
         bid = self.VV[0]
         ask = self.VV[1]
