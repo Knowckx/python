@@ -1,4 +1,6 @@
 from bookut import bookdiff,mean,utlist
+from .signset import *
+# from signal import *
 
 
 class Core:
@@ -8,7 +10,10 @@ class Core:
         self.MaxGap = maxGap
         self.SignH = Signal(2)
         self.SignL = Signal(-2)
+        self.histyL = [] # 记录历史上的决策
         pass
+
+
 
 
     def PutNew(self, bookL,i=-1):
@@ -38,7 +43,7 @@ class Core:
 
     def OpenLow(self):
         print("new Lower")
-        self.SignL.Reset(self.i,self.lmt,)  # 重置低集
+        self.SignL.Reset(self.i,self.Nprc,self.lmt)  # 重置低集
         self.Low = self.Nprc # 低价 更新
         if self.CheckGap():
             self.High = self.Low + self.MaxGap
@@ -46,7 +51,7 @@ class Core:
 
     def OpenHigh(self):
         print("new Higher")
-        self.SignH.Reset(self.i,self.lmt)  # 重置高集
+        self.SignH.Reset(self.i,self.Nprc,self.lmt)  # 重置高集
         self.High = self.Nprc
         if self.CheckGap():
             self.Low = self.High - self.MaxGap
@@ -68,6 +73,7 @@ class Core:
         print("try update Sign low")
         print("Sign Low:",ok,ss)
         if ok:
+            self.addHis(self.SignL.GetHisEx())
             self.SignL.Close()
             self.OpenHigh()
 
@@ -80,7 +86,8 @@ class Core:
             return
         print("try update Sign High")
         print("Sign High:",ok,ss)
-        if ok:
+        if ok:  
+            self.addHis(self.SignH.GetHisEx())
             self.SignH.Close()
             self.OpenLow()
 
@@ -95,58 +102,14 @@ class Core:
         print("high and low:",self.High,self.Low)
         print("Sign high and low:",self.SignH,self.SignL)
 
- 
-# Class Signal 信号判断集
-class Signal:
-    def __init__(self,flag=2):
-        self.Close()
-        self.Flag = flag
+    def DumpHisty(self):
+        print("DumpCoreHisty:")
+        for his in self.histyL:
+            print(his)
+    
+    def addHis(self,L):
+        self.histyL.append(L)
 
-    def Reset(self,i=-1,maxLimit=15):
-        self.VV = [0,0] 
-        self.Open = True
-        self.CountLimit = maxLimit
-        self.i = i
-        self.Cnt = 0 # 目前记录的次数
-    def Close(self):
-        self.VV = [0,0] 
-        self.Open = False
-    def IsOpen(self):
-        return self.Open 
-
-    def PrintNow(self):
-        print("SignalStatus isopen:%s VV:%s"%(self.Open,self.VV))
-
-    def Add(self,dd):
-        self.VV[0] = self.VV[0]+dd[0]
-        self.VV[1] = self.VV[1]+dd[1]
-        self.Cnt = self.Cnt + 1
-    def Update(self,dd):
-        if not self.IsOpen():  #is close
-            return False,"500"
-        self.PrintNow()
-        self.Add(dd)
-        self.PrintNow()
-        ok,detail = self.IsAction()
-        return ok,detail
-
-    def IsAction(self):
-        if self.Cnt <= 2:
-            return  False,"Put Count not enough"
-        bid = self.VV[0]
-        ask = self.VV[1]
-        big = 0
-        small = 0
-        if (bid + ask) < self.CountLimit:  #self.CountLimit
-            return  False,"Total Count not enough"
-        if self.Flag > 0:  # 2是高位，big = ask
-            if ask >= abs(self.Flag)*bid:
-                return True,"Top! Sell!"
-        if self.Flag < 0:
-            if bid >= abs(self.Flag)*ask:
-                return True,"low! buy!"
-        return False,"Not Ready"
-        
 # book - bookdif - [+-11]上的变动
 def difToSignal(bookL):
     difL = bookdiff.Start(bookL[:])
