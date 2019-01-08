@@ -7,7 +7,7 @@ class Signal:
     def Reset(self,His=-1,HisP = -1,maxLimit=15):
         self.VV = [0,0] 
         self.Open = True
-        self.CountLimit = maxLimit
+        self.Limit = maxLimit
         self.Cnt = 0 # 目前记录的次数
         self.SetHisEx(His,HisP)
 
@@ -47,16 +47,25 @@ class Signal:
         ask = self.VV[1]
         big = 0
         small = 0
-        if (bid + ask) < self.CountLimit:  #self.CountLimit
+        if (bid + ask) < self.Limit:  #self.Limit
             return  False,"Total Count not enough"
-        if self.Flag > 0:  # 2是高位，big = ask
-            if ask >= abs(self.Flag)*bid:
+        f = 1/(abs(self.Flag) + 1)
+        if self.Flag > 0:  # 2 高位
+            if (ask - bid) >= self.Limit*f:
                 return True,"Top! Sell!"
         if self.Flag < 0:
-            if bid >= abs(self.Flag)*ask:
+            if (bid - ask) >= self.Limit*f:
                 return True,"low! buy!"
         return False,"Not Ready"
 
+
+#判断标准1
+        # if self.Flag > 0:  # 2 高位
+        #     if ask >= abs(self.Flag)*bid:
+        #         return True,"Top! Sell!"
+        # if self.Flag < 0:
+        #     if bid >= abs(self.Flag)*ask:
+        #         return True,"low! buy!"
 
 
 
