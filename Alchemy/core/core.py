@@ -73,7 +73,7 @@ class Core:
         print("try update Sign low")
         print("Sign Low:",ok,ss)
         if ok:
-            self.addHis(self.SignL.GetHisEx())
+            self.addHis(TupleToList(self.SignL.GetHisEx()))
             self.SignL.Close()
             self.OpenHigh()
 
@@ -87,7 +87,7 @@ class Core:
         print("try update Sign High")
         print("Sign High:",ok,ss)
         if ok:  
-            self.addHis(self.SignH.GetHisEx())
+            self.addHis(TupleToList(self.SignH.GetHisEx()))
             self.SignH.Close()
             self.OpenLow()
 
@@ -108,6 +108,11 @@ class Core:
             print(his)
     
     def addHis(self,L):
+        hisL = self.histyL
+        if len(hisL) > 0:
+            last = hisL[-1]
+            dif = GetDifPst(last[1],L[1])
+            last.append(dif)
         self.histyL.append(L)
 
 # book - bookdif - [+-11]上的变动
@@ -133,6 +138,16 @@ def difToSignal(bookL):
     return rst
 
 
+# 两数差值的百分比
+def GetDifPst(v1,v2):
+    dif = (v2 - v1)/v1*100
+    return round(dif,2)
+
+def TupleToList(tu):
+    rst = []
+    for t in tu:
+        rst.append(t)
+    return rst
 
 
 def isZero(dd):

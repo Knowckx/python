@@ -7,8 +7,8 @@ from core import core
 def Start():
     tCore = core.Core()
     ex.InitSht()
-    start = 3520
-    end  = 4620
+    start = 2612
+    end  = 3600
     ex.LoopIdx = start #dubug start
     # ex.LoopIdx = 20522 #dubug
     # ex.LoopIdx = 20658 #dubug
