@@ -54,6 +54,7 @@ def BookNext():
             book = GetBookEx(LoopIdx,2)
             return book,LoopIdx
 
+# 某行数据
 def BookSpeNext(col):
     global LoopIdx
     book = []

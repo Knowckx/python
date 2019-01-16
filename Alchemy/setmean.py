@@ -6,25 +6,28 @@ from bookut import extremum
 # 期望值
 def setmean():
     ex.InitSht()
-    ex.LoopIdx = 3
+    ex.LoopIdx = 2500
+    endIdx = 3000
     while True:
-        v,i = BookSpeNext(7)
-
-        # bookL,i = ex.BookNext()
-        # if len(bookL) == 0:
-        #     break
-        # print("----- 行数",i)
-        # Action(bookL,i)
-    extremum.DumpHisty()
+        bookL,i = ex.BookNext()
+        if len(bookL) == 0:
+            break
+        if i >= endIdx:
+            break
+        print("----- 行数",i)
+        Action(bookL,i)
 
 def Action(book,i):
     rst = mean.GetPredictP(book)
-    # ex.SetCell(i,7,rst)
-
+    ss = rst.String()
+    ex.SetCell(i,7,ss)
     # vv = sht.Cells(i, coreCol).Value
 
 
 setmean()
+
+
+
 
 
 
