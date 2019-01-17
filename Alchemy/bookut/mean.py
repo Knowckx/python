@@ -36,16 +36,32 @@ def GetFacVol(li):
     MeanP = TotalP/TotalLots
     return MeanP,TotalLots
 
-# Class Signal 盘面评估
+# Class Mean 盘面评估
 class mean:
     def __init__(self,prc,lots):
         self.prc = prc  #评估价格
         self.lots = lots #评估量
 
-    def IsBig(self, meanV):
-        if self.prc == meanV.prc:
+    def __gt__(self, meanV):
+        if self.prc == meanV.prc :
             return self.lots > meanV.lots
         return self.prc > meanV.prc
+
+    def __lt__(self, meanV):
+        if self.prc == meanV.prc :
+            return self.lots < meanV.lots
+        return self.prc < meanV.prc
+
+    def __eq__(self, meanV):
+        return self.prc - meanV.prc 
+
+    def __sub__(self, meanV):
+        if self.prc == meanV.prc and self.lots == meanV.lots:
+            return True
+        return False
+
+    def __str__(self):
+        self.String()
 
     def String(self):
         # ss = '%.4f,%.3f' % (self.prc,self.lots)
@@ -55,4 +71,6 @@ class mean:
         return ss
 
 
-        
+a1 = mean(5,10)
+a2 = mean(5,11)
+print(a1<a2)

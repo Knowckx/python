@@ -6,8 +6,8 @@ from bookut import extremum
 # 期望值
 def setmean():
     ex.InitSht()
-    ex.LoopIdx = 2500
-    endIdx = 3000
+    ex.LoopIdx = 2
+    endIdx = 99999
     while True:
         bookL,i = ex.BookNext()
         if len(bookL) == 0:

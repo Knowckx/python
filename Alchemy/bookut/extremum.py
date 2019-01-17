@@ -39,7 +39,8 @@ def PutNewV(nv,idx):
 #1 new is max | -1 new is min
 def IsExtm(mode=1):
     global histyL
-    if (maxL[0] - minL[0]) < amplitude:
+    dif = maxL[0] - minL[0]
+    if dif < amplitude:
         return False
     
     # 确定是一个极值
