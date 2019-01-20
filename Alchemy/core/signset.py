@@ -1,25 +1,28 @@
+from bookut import mean,utlist
+import corefunc
+
 # Class Signal 信号判断集
 class Signal:
-    def __init__(self,flag=2):
+    def __init__(self,vtype,flag=2):
         self.Close()
-        self.Flag = flag
+        self.Type = vtype #类型 1 高点判断集 -1 低点判断集
+        self.Flag = vtype*2 #破位信号比例
+        self.Open = True #是否起效
 
-    def Reset(self,His=-1,HisP = -1,maxLimit=15):
-        self.VV = [0,0] 
-        self.Open = True
-        self.Limit = maxLimit
+    def Reset(self,bookL,HisI):
+        self.HisI = HisI # 极点值的序号
+        self.HisV = mean.GetPredictP(bookL[:])  #极点价格
+        self.Limit = utlist.AvgLotL(bookL[:])*1.5 #破位信号总量
+
+        self.VV = [0,0] #多空数量
         self.Cnt = 0 # 目前记录的次数
-        self.SetHisEx(His,HisP)
+        self.Open = True #是否起效
 
-    def SetHisEx(self,His,HisP):
-        self.His = His    #极点位置
-        self.HisP = HisP  #极点价格
-
+    #返回相对历史极值
     def GetHisEx(self):
-        return self.His,self.HisP 
+        return self.HisI,self.HisV 
 
     def Close(self):
-        self.VV = [0,0] 
         self.Open = False
     def IsOpen(self):
         return self.Open 
@@ -32,32 +35,41 @@ class Signal:
         self.VV[1] = self.VV[1]+dd[1]
         self.Cnt = self.Cnt + 1
     
-    def Update(self,dd):
-        if not self.IsOpen():  #is close
-            return False,"500"
+    def Update(self,bookL,HisI):
+        if not self.IsOpen():  #1.is closed
+            return 501
+        NewV = mean.GetPredictP(bookL[:])  #2.是否是极值的reset操作
+        if (self.Type == 1 and NewV > self.HisV) or (self.Type == -1 and NewV < self.HisV):
+            self.Reset(bookL,HisI)
+            return 502
+
+        diff = corefunc.difToSignal(bookL[:]) #本次的变动
+        if isZero(diff): # 3.过滤diff为0的盘面
+            return 503
+        
+        # 是值得更新的
         self.PrintNow()
-        self.Add(dd)
+        self.Add(newV)
         self.PrintNow()
         return self.IsAction()
 
     def IsAction(self):
-        if self.Cnt <= 3:
-            return  False,"Put Count not enough"
+        if self.Cnt <= 3: #次数不够
+            return 301
         bid = self.VV[0]
         ask = self.VV[1]
+        if (bid + ask) < self.Limit:  #bid + ask 总数不够
+            return  302
         big = 0
         small = 0
-        if (bid + ask) < self.Limit:  #self.Limit
-            return  False,"Total Count not enough"
         f = 1/(abs(self.Flag) + 1)
         if self.Flag > 0:  # 2 高位
             if (ask - bid) >= self.Limit*f:
-                return True,"Top! Sell!"
+                return 1 #卖
         if self.Flag < 0:
             if (bid - ask) >= self.Limit*f:
-                return True,"low! buy!"
-        return False,"Not Ready"
-
+                return -1 #买
+        return 300 #就是还没满足条件
 
 #判断标准1
         # if self.Flag > 0:  # 2 高位

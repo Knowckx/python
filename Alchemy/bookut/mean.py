@@ -47,30 +47,42 @@ class mean:
             return self.lots > meanV.lots
         return self.prc > meanV.prc
 
+    def __ge__(self, meanV):
+        return self.__gt__(meanV) or self.__eq__(meanV)
+
     def __lt__(self, meanV):
         if self.prc == meanV.prc :
             return self.lots < meanV.lots
         return self.prc < meanV.prc
 
-    def __eq__(self, meanV):
-        return self.prc - meanV.prc 
+    def __le__(self, meanV):
+        return self.__lt__(meanV) or self.__eq__(meanV)
 
-    def __sub__(self, meanV):
+    def __eq__(self, meanV):
         if self.prc == meanV.prc and self.lots == meanV.lots:
             return True
         return False
 
+
+
+    def __add__(self, meanV):
+        return self.prc + meanV.prc 
+
+    def __sub__(self, meanV):
+        return self.prc - meanV.prc 
+
     def __str__(self):
-        self.String()
+        return self.String()
 
     def String(self):
         # ss = '%.4f,%.3f' % (self.prc,self.lots)
         prc =round(self.prc,5)
         lots =round(self.lots,5)
-        ss = '%s,%s' % (prc,lots)
+        ss = '%s(%s)' % (prc,lots)
         return ss
 
 
-a1 = mean(5,10)
-a2 = mean(5,11)
-print(a1<a2)
+# a1 = mean(5,10)
+# a2 = mean(5,11)
+# a1 = [a1,5]
+# print('%s at %d' % (a1[0],a1[1]))
