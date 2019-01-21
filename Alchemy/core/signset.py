@@ -1,5 +1,5 @@
 from bookut import mean,utlist
-import corefunc
+from . import corefunc
 
 # Class Signal 信号判断集
 class Signal:
@@ -7,7 +7,7 @@ class Signal:
         self.Close()
         self.Type = vtype #类型 1 高点判断集 -1 低点判断集
         self.Flag = vtype*2 #破位信号比例
-        self.Open = True #是否起效
+        self.Open = False #是否起效  默认false
 
     def Reset(self,bookL,HisI):
         self.HisI = HisI # 极点值的序号
@@ -44,12 +44,12 @@ class Signal:
             return 502
 
         diff = corefunc.difToSignal(bookL[:]) #本次的变动
-        if isZero(diff): # 3.过滤diff为0的盘面
+        if corefunc.isZero(diff): # 3.过滤diff为0的盘面
             return 503
         
         # 是值得更新的
         self.PrintNow()
-        self.Add(newV)
+        self.Add(diff)
         self.PrintNow()
         return self.IsAction()
 

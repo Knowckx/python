@@ -81,6 +81,9 @@ class mean:
         ss = '%s(%s)' % (prc,lots)
         return ss
 
+    def V(self):
+        return self.prc
+
 
 # a1 = mean(5,10)
 # a2 = mean(5,11)

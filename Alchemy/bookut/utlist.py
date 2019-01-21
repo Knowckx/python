@@ -34,3 +34,11 @@ def DelMin(li):
 def DelMax(li):
     li.pop(li.index(max(li)))
 
+
+
+# 遍历转类型
+def TupleToList(tu):
+    rst = []
+    for t in tu:
+        rst.append(t)
+    return rst
