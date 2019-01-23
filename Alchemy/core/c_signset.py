@@ -9,21 +9,18 @@ class Signal:
         self.Flag = vtype*2 #破位信号比例
         self.Open = False #是否起效  默认false
 
-    def Reset(self,bookL,HisI):
-        self.HisI = HisI # 极点值的序号
-        self.HisV = mean.GetPredictP(bookL[:])  #极点价格
-        self.Limit = utlist.AvgLotL(bookL[:])*1.5 #破位信号总量
+    def Reset(self,book):
+        self.HisI = book.HisI  #极点值的序号
+        self.HisV = book.NewV  #极点价格
+        self.Limit = book.GetAvgLot() #破位信号总量
 
         self.VV = [0,0] #多空数量
         self.Cnt = 0 # 目前记录的次数
         self.Open = True #是否起效
 
-    def Sync(self,dif,newV):
-        self.Dif = dif
-        self.NewV = newV
-
-        
-
+    # def Sync(self,dif,newV):
+    #     self.Dif = dif
+    #     self.NewV = newV
 
     #返回相对历史极值
     def GetHisEx(self):
@@ -42,20 +39,20 @@ class Signal:
         self.VV[1] = self.VV[1]+dd[1]
         self.Cnt = self.Cnt + 1
     
-    def Update(self,bookL,HisI):
+    def Update(self,book):
         if not self.IsOpen():  #1.is closed
             return 501
-        NewV = self.NewV
+        NewV = book.NewV
         if (self.Type == 1 and NewV > self.HisV) or (self.Type == -1 and NewV < self.HisV):
-            self.Reset(bookL,HisI)
+            self.Reset(book)
             return 502
 
-        if corefunc.isZero(diff): # 3.过滤diff为0的盘面
+        if corefunc.isZero(book.DifL): # 3.过滤diff为0的盘面
             return 503
         
         # 是值得更新的
         self.PrintNow()
-        self.Add(self.diff)
+        self.Add(book.DifL)
         self.PrintNow()
         return self.IsAction()
 

@@ -26,6 +26,6 @@ def difToSignal(bookL):
 
 def isZero(dif):
     if dif[0]==0 and dif[1]==0:
-        print("dif is %s.Pass"%dif)
+        # print("dif is %s.Pass"%dif)
         return True
     return False

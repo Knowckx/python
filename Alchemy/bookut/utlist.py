@@ -1,7 +1,7 @@
 
 
 
-# 去掉最大最小值后的lots
+# 去掉最大最小值后的平均lots
 def AvgLotL(bookLL):
     ll = CleanLotL(bookLL[:])
     cnt,tt = 0,0
