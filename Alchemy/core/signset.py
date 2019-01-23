@@ -18,6 +18,13 @@ class Signal:
         self.Cnt = 0 # 目前记录的次数
         self.Open = True #是否起效
 
+    def Sync(self,dif,newV):
+        self.Dif = dif
+        self.NewV = newV
+
+        
+
+
     #返回相对历史极值
     def GetHisEx(self):
         return self.HisI,self.HisV 
@@ -38,18 +45,17 @@ class Signal:
     def Update(self,bookL,HisI):
         if not self.IsOpen():  #1.is closed
             return 501
-        NewV = mean.GetPredictP(bookL[:])  #2.是否是极值的reset操作
+        NewV = self.NewV
         if (self.Type == 1 and NewV > self.HisV) or (self.Type == -1 and NewV < self.HisV):
             self.Reset(bookL,HisI)
             return 502
 
-        diff = corefunc.difToSignal(bookL[:]) #本次的变动
         if corefunc.isZero(diff): # 3.过滤diff为0的盘面
             return 503
         
         # 是值得更新的
         self.PrintNow()
-        self.Add(diff)
+        self.Add(self.diff)
         self.PrintNow()
         return self.IsAction()
 
@@ -60,6 +66,8 @@ class Signal:
         ask = self.VV[1]
         if (bid + ask) < self.Limit:  #bid + ask 总数不够
             return  302
+        if bid < 1 or ask < 1:  #反向必须有一手
+            return  303
         big = 0
         small = 0
         f = 1/(abs(self.Flag) + 1)

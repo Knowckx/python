@@ -8,6 +8,8 @@ def Start():
     tCore = core.Core()
     ex.InitSht()
     start = 3500
+    # start = 3800
+
     # end  = 3700
 
     end  = 4680

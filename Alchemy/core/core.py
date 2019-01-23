@@ -11,20 +11,25 @@ class Core:
         self.histyL = [] # 记录历史上的决策
 
     def PutNew(self,bookL,HisI):
+        self.diff = corefunc.difToSignal(bookL[:]) #统一算一次diff.防止刷新多次diff.lastbook.
+        self.NewV = mean.GetPredictP(bookL[:])      #统一算一次NewV  Mean
+        self.HisI = HisI # 极点值的序号
+        self.HisB = bookL
+
         # 初始状态 两个都是false
         if (not self.SignH.IsOpen()) and (not self.SignL.IsOpen()):
             self.SignH.Reset(bookL,HisI)
             self.SignL.Reset(bookL,HisI)
             return
 
-        self.HisI = HisI # 极点值的序号
-        self.HisB = bookL
+
         self.UpdateH()
         self.UpdateL()
         # print('prc %s  his: %s %s'%(self.Nprc,self.Low,self.High))
 
      # 峰值，要不要sell?
     def UpdateH(self):
+        self.SignH.Sync(self.diff,self.NewV)
         statusCode = self.SignH.Update(self.HisB,self.HisI) # 判断..
         if statusCode == 501: #Signal is Closed
             return
@@ -37,6 +42,7 @@ class Core:
 
     # 低值，要不要buy?
     def UpdateL(self):
+        self.SignH.Sync(self.diff,self.NewV)
         statusCode = self.SignL.Update(self.HisB,self.HisI)
         if statusCode == 501: #Signal is Closed
             return
