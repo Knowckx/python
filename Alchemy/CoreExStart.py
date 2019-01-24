@@ -7,8 +7,8 @@ from core import core
 def Start():
     tCore = core.Core()
     ex.InitSht()
-    start = 3500
-    # start = 3800
+    # start = 3500
+    start = 4300
 
     # end  = 3700
 

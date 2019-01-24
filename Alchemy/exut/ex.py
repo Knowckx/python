@@ -63,7 +63,7 @@ def BookSpeNext(col):
         LoopIdx = LoopIdx + 1
         prc = sht.Cells(LoopIdx, 2).Value
         if prc == None or prc == "":
-            return book,LoopIdx
+            return None,LoopIdx
         if prc == "Bid5":
             LoopIdx = LoopIdx + 1
             value = sht.Cells(LoopIdx, col).Value

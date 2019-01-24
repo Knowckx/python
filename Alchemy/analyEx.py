@@ -4,19 +4,21 @@ from exut import ex
 # 分析极值分布
 def extremum1():
     ex.InitSht()
-    ex.LoopIdx = 3500
+    ex.LoopIdx = 3
     extremum.amplitude = 0.01
     while True:
         str1,i = ex.BookSpeNext(7)
+        print("----- 行数",i,str1)
         if str1 == None or str1 == '':
-            return
-        print("----- 行数",i)
-        vv = StrToMean(str1)
-        extremum.PutNewV(vv,i)
-
-        if ex.LoopIdx >= 4682:
             break
+        vv = StrToMean(str1)
+        extremum.PutNewV(i,vv)
+
+        if ex.LoopIdx >= 30000:
+            break
+
     extremum.DumpHisty()
+
 
 def StrToMean(ss):
     strs = ss.split(",")
