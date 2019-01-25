@@ -5,7 +5,7 @@ from exut import ex
 def extremum1():
     ex.InitSht()
     ex.LoopIdx = 3
-    extremum.amplitude = 0.01
+    extremum.amplitude = 0.02
     while True:
         str1,i = ex.BookSpeNext(7)
         print("----- 行数",i,str1)

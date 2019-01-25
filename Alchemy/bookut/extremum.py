@@ -3,7 +3,7 @@
 # 判断最大最小值
 
 # amplitude 振幅   波谷到波峰为两倍的振幅。 1倍就可以确定是不是高点低点
-amplitude = 0.03
+amplitude = 0.02
 lastL = 0 # 上一次是高点 1 还是低点 -1  init状态 0
 maxL = [-1,-1]
 minL = [-1,-1]
