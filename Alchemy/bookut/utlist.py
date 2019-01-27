@@ -5,10 +5,9 @@
 def AvgLotL(bookLL):
     ll = CleanLotL(bookLL[:])
     cnt,tt = 0,0
-    for l in ll[:]:
-        if l != 0:
-            cnt = cnt + 1
-            tt = tt+ l
+    for v in ll[:]:
+        cnt = cnt + 1
+        tt = tt+ v
     avg = tt/cnt
     return avg
 

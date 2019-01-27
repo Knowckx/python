@@ -1,22 +1,25 @@
 from exut import ex
 from core import core
-
+import sys
 
 
 #back test in excel.
 def Start():
+    stdout = sys.stdout
+    doc = open('Alchemy\log.txt','w', encoding='utf-8')
+    sys.stdout=doc
+
     tCore = core.Core()
     ex.InitSht()
     # start = 3500
-    start = 4300
+    start = 11200
 
     # end  = 3700
 
-    end  = 4680
+    end  = 11600
     ex.LoopIdx = start #dubug start
     # ex.LoopIdx = 20522 #dubug
     # ex.LoopIdx = 20658 #dubug
-
 
     while True:
         bookL,i = ex.BookNext()
@@ -28,5 +31,8 @@ def Start():
         tCore.PutNew(bookL,i)
 
     tCore.DumpHisty()
+    sys.stdout= stdout
+    doc.close()
+
 
 Start()

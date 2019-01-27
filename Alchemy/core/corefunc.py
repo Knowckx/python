@@ -3,6 +3,7 @@
 from bookut import bookdiff
 
 # 返回 转化为[+-11]上的相对变动
+# 
 def difToSignal(bookL):
     difL = bookdiff.Start(bookL[:])
     rst = [0,0]
@@ -21,7 +22,12 @@ def difToSignal(bookL):
             rst[0] = rst[0] + vv
         else: # 空
             rst[1] = rst[1] + abs(vv)
-    print('diff:%s ToSign:%s'%(difL[:],rst))
+    if isZero(rst):
+        return None
+    if rst[0] == rst[1]: #[-11, -26], [11, 26] 这种情况，是多空同时增量力量
+        rst = [c/10 for c in rst]
+        
+    print('diff:%s ToDifSign:%s'%(difL[:],rst))
     return rst
 
 def isZero(dif):

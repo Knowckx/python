@@ -12,12 +12,13 @@ class Signal:
     def Reset(self,book):
         self.HisI = book.HisI  #极点值的序号
         self.HisV = book.NewV  #极点价格
-        self.Limit = book.GetAvgLot() #破位信号总量
+        self.Limit = book.GetAvgLot()*1 #破位信号总量
 
         self.VV = [0,0] #多空数量
         self.Cnt = 0 # 目前记录的次数
         self.Open = True #是否起效
 
+        print("reset in I:%d Prc:%s AvgLot:%f"%(book.HisI,book.NewV,self.Limit))
     # def Sync(self,dif,newV):
     #     self.Dif = dif
     #     self.NewV = newV
@@ -43,17 +44,16 @@ class Signal:
         if not self.IsOpen():  #1.is closed
             return 501
         NewV = book.NewV
-        if (self.Type == 1 and NewV > self.HisV) or (self.Type == -1 and NewV < self.HisV):
+        if (self.Type == 1 and NewV >= self.HisV) or (self.Type == -1 and NewV <= self.HisV):
             self.Reset(book)
             return 502
 
-        if corefunc.isZero(book.DifL): # 3.过滤diff为0的盘面
+        if book.DifL == None: # 3.过滤diff为0的盘面
             return 503
         
         # 是值得更新的
-        self.PrintNow()
         self.Add(book.DifL)
-        self.PrintNow()
+        print("Signal Updated:  VV %s"%(self.VV))
         return self.IsAction()
 
     def IsAction(self):
