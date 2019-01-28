@@ -12,11 +12,11 @@ def Start():
     tCore = core.Core()
     ex.InitSht()
     # start = 3500
-    start = 11200
+    start = 9700
 
     # end  = 3700
 
-    end  = 11600
+    end  = 11000
     ex.LoopIdx = start #dubug start
     # ex.LoopIdx = 20522 #dubug
     # ex.LoopIdx = 20658 #dubug
