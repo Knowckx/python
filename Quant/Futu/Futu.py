@@ -1,4 +1,4 @@
-from futuquant import *
+import futu as ft
 
 
 
@@ -8,7 +8,7 @@ def Init():
 
 #ID 'HK.00700'
 def GetTick(ID):
-    quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
+    quote_ctx = ft.OpenQuoteContext(host='127.0.0.1', port=11111)
     quote_ctx.subscribe([ID], [SubType.TICKER])
     ok,dfData = quote_ctx.get_rt_ticker(ID, 1000)
     if ok == RET_OK: # RET_OK是他的全局变量哦

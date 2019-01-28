@@ -1,4 +1,4 @@
-from bookut import mean,utlist
+from Alchemy.bookut import mean,utlist
 from . import corefunc
 
 # Class Signal 信号判断集

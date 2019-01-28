@@ -1,7 +1,7 @@
 
 from . import FutuUtil, FutuClass
 from . import CBook
-from futuquant import *
+import futu as ft
 from libs import date
 
 
@@ -13,12 +13,22 @@ BidL1 = []
 
 def Init():
     global quote_ctx
-    quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
+    quote_ctx = ft.OpenQuoteContext(host='127.0.0.1', port=11111)
+    quote_ctx.start()  
+
+def InitSZ(SID):
+    market = ft.Market.SZ
+    ret_code, data = quote_ctx.get_stock_basicinfo(
+        market, ft.SecurityType.STOCK, SID)
+    CheckRetCode(ret_code)
+    FutuUtil.SMap[SID] = data
+    print(SID,data["name"][0])
 
 
 def InitBasic(SID):
     ret_code, data = quote_ctx.get_stock_basicinfo(
-        Market.HK, SecurityType.STOCK, SID)
+        ft.Market.HK, SecurityType.STOCK, SID)
+
     CheckRetCode(ret_code)
     FutuUtil.SMap[SID] = data
     print(SID,data["name"][0])
@@ -29,8 +39,7 @@ def Subs(SID):
     quote_ctx.set_handler(tickHandler)
     bookhandler = FutuClass.OrderBookTest(HandleBook)
     quote_ctx.set_handler(bookhandler)
-    # quote_ctx.subscribe([SID], [SubType.ORDER_BOOK])
-    quote_ctx.subscribe([SID], [SubType.ORDER_BOOK, SubType.TICKER])
+    quote_ctx.subscribe([SID], [ft.SubType.ORDER_BOOK, ft.SubType.TICKER])
 
 
 # 回调 摆盘
@@ -43,10 +52,10 @@ def HandleBook(data):
     AskL1 = data["Ask"][:5]
     BidL1 = data["Bid"][:5]
     SID = data["code"]
-    #     print(df)
-    if rstDiff !="":
-        print(df['core'][0],"diff:",rstDiff)
-    recordData(df, SID)
+    print(df)
+    # if rstDiff !="":
+    #     print(df['core'][0],"diff:",rstDiff)
+    # recordData(df, SID)
 
 
 
@@ -58,11 +67,11 @@ def HandleTicker(data=None):
     # if data["lots"][0] > 5:
     #     print(data)
 #     print(data)
-    recordData(data, SID)
+    # recordData(data, SID)
 
 
 def CheckRetCode(ret_code):
-    if ret_code != RET_OK:
+    if ret_code != ft.RET_OK:
         print("error, msg: %s" % data)
         sys.exit()
 

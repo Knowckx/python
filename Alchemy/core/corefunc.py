@@ -1,6 +1,6 @@
 # 放core相关的函数
 
-from bookut import bookdiff
+from Alchemy.bookut import bookdiff
 
 # 返回 转化为[+-11]上的相对变动
 def difToSignal(bookL):
@@ -21,7 +21,7 @@ def difToSignal(bookL):
             rst[0] = rst[0] + vv
         else: # 空
             rst[1] = rst[1] + abs(vv)
-    print('diff:%s ToSign:%s'%(difL[:],rst))
+    print('diff:%s ToSign:%s\n'%(difL[:],rst))
     return rst
 
 def isZero(dif):

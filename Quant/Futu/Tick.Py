@@ -1,7 +1,7 @@
 import time
-from futuquant import *
+import futu as ft
 
-class TickerTest(TickerHandlerBase):
+class TickerTest(ft.TickerHandlerBase):
         def on_recv_rsp(self, rsp_str):
                 ret_code, data = super(TickerTest,self).on_recv_rsp(rsp_str)
                 if ret_code != RET_OK:
@@ -11,7 +11,7 @@ class TickerTest(TickerHandlerBase):
                 print("TickerTest ", data) # TickerTest自己的处理逻辑
                 return RET_OK, data
 
-quote_ctx = OpenQuoteContext(host='127.0.0.1', port=11111)
+quote_ctx = ft.(host='127.0.0.1', port=11111)
 handler = TickerTest()
 quote_ctx.set_handler(handler)
 

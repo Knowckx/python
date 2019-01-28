@@ -1,6 +1,7 @@
 
 import pandas as pd
 from Alchemy.bookut import bookdiff,mean
+from  Alchemy.core.c_book import *
 
 
 class Book:
@@ -9,6 +10,7 @@ class Book:
         self.AskL = FutuBook["Ask"]
         self.BidL = FutuBook["Bid"]
         self.Mean = mean.GetPredictP([self.BidL[:5],self.AskL[:5]])
+        self.Book1 = CBook([FutuBook["Bid"][:],FutuBook["Ask"][:]],0)
 
     def ToDF(self):
         df = pd.DataFrame()
@@ -22,13 +24,14 @@ class Book:
         return df
 
     def GetDiff(self,AskL1,BidL1):
-        if len(AskL1) == 0:
-            return ""
-        rstDiff = bookdiff.Start(AskL1,BidL1,self.AskL[:5],self.BidL[:5])
-        DiffL = bookdiff.ScreenRst(rstDiff[:])
-        if len(DiffL) ==0:
-            DiffL = ""
-        return DiffL
+        return self.Book1.DifL
+        # if len(AskL1) == 0:
+        #     return ""
+        # rstDiff = bookdiff.Start(AskL1,BidL1,self.AskL[:5],self.BidL[:5])
+        # DiffL = bookdiff.ScreenRst(rstDiff[:])
+        # if len(DiffL) ==0:
+        #     DiffL = ""
+        # return DiffL
 
 def ListToStr(ins):
     for i in range(0, len(ins)):

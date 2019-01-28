@@ -1,5 +1,5 @@
 
-from futuquant import *
+from futu import *
 
 
 class TickerTest(TickerHandlerBase):
