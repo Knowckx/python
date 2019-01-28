@@ -14,5 +14,5 @@ class CBook:
         self.NewV = mean.GetPredictP(bookL[:])     #统一算一次NewV  Mean
     
     def GetAvgLot(self):
-        AvgLot = utlist.AvgLotL(self.BookL[:])*1.5 #破位信号总量
+        AvgLot = utlist.AvgLotL(self.BookL[:]) #破位信号总量
         return AvgLot 

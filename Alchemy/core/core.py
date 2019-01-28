@@ -30,8 +30,7 @@ class Core:
         statusCode = self.SignH.Update(self.Book) # 判断..
         if statusCode == 501: #Signal is Closed
             return 
-        print("try update Sign High")
-        print("High.Update Result :",statusCode)
+        print("Sign High result:",statusCode)
         if statusCode == 1:  # 确定是个高点回落信号
             self.addHis(self.SignH.GetHisEx())
             self.SignH.Close()
@@ -44,8 +43,7 @@ class Core:
         statusCode = self.SignL.Update(self.Book)
         if statusCode == 501: #Signal is Closed
             return
-        print("try update Sign low")
-        print("Sign Low:",statusCode)
+        print("Sign low result:",statusCode)
         if statusCode == -1:
             self.addHis(self.SignL.GetHisEx())
             self.SignL.Close()

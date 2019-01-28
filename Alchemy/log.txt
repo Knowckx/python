@@ -1,0 +1,528 @@
+----- 行数 11204
+reset in I:11204 Prc:0.61(-7.12) AvgLot:7.125000
+reset in I:11204 Prc:0.61(-7.12) AvgLot:7.125000
+----- 行数 11206
+Sign High result: 503
+reset in I:11206 Prc:0.61(-7.18) AvgLot:6.750000
+Sign low result: 502
+----- 行数 11208
+diff:[[-11, 3]] ToDifSign:[3, 0]
+reset in I:11208 Prc:0.61(-5.08) AvgLot:7.125000
+Sign High result: 502
+Signal Updated:  VV [3, 0]
+Sign low result: 301
+----- 行数 11210
+diff:[[-11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 1]
+Sign High result: 301
+Signal Updated:  VV [3, 1]
+Sign low result: 301
+----- 行数 11214
+Sign High result: 503
+Sign low result: 503
+----- 行数 11216
+Sign High result: 503
+Sign low result: 503
+----- 行数 11218
+diff:[[-11, -3]] ToDifSign:[0, 3]
+Signal Updated:  VV [0, 4]
+Sign High result: 301
+reset in I:11218 Prc:0.61(-7.56) AvgLot:7.250000
+Sign low result: 502
+----- 行数 11220
+Sign High result: 503
+Sign low result: 503
+----- 行数 11222
+Sign High result: 503
+reset in I:11222 Prc:0.61(-7.8) AvgLot:7.250000
+Sign low result: 502
+----- 行数 11224
+diff:[[9, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 5]
+Sign High result: 301
+reset in I:11224 Prc:0.605(-2.34) AvgLot:7.125000
+Sign low result: 502
+----- 行数 11226
+diff:[[-11, 5]] ToDifSign:[5, 0]
+Signal Updated:  VV [5, 5]
+Sign High result: 300
+Signal Updated:  VV [5, 0]
+Sign low result: 301
+----- 行数 11228
+Sign High result: 503
+Sign low result: 503
+----- 行数 11230
+diff:[[11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [5, 6]
+Sign High result: 300
+Signal Updated:  VV [5, 1]
+Sign low result: 301
+----- 行数 11232
+Sign High result: 503
+Sign low result: 503
+----- 行数 11234
+Sign High result: 503
+Sign low result: 503
+----- 行数 11236
+diff:[[11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [5, 7]
+Sign High result: 300
+Signal Updated:  VV [5, 2]
+Sign low result: 301
+----- 行数 11238
+diff:[[-11, -4]] ToDifSign:[0, 4]
+Signal Updated:  VV [5, 11]
+Sign High result: 1
+reset in I:11238 Prc:0.605(-3.24) AvgLot:7.375000
+----- 行数 11242
+Sign low result: 503
+----- 行数 11244
+diff:[[-11, 2]] ToDifSign:[2, 0]
+Signal Updated:  VV [2, 0]
+Sign low result: 301
+----- 行数 11246
+diff:[[-11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [2, 1]
+Sign low result: 301
+----- 行数 11250
+diff:[[-11, 6]] ToDifSign:[6, 0]
+Signal Updated:  VV [8, 1]
+Sign low result: 301
+----- 行数 11252
+diff:[[-13, -8], [-12, -1], [-11, -9]] ToDifSign:[0, 10.0]
+reset in I:11252 Prc:0.575(7.58) AvgLot:7.250000
+Sign low result: 502
+----- 行数 11259
+reset in I:11259 Prc:0.575(7.5) AvgLot:7.375000
+Sign low result: 502
+----- 行数 11261
+reset in I:11261 Prc:0.575(7.26) AvgLot:7.750000
+Sign low result: 502
+----- 行数 11263
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [1, 0]
+Sign low result: 301
+----- 行数 11267
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [2, 0]
+Sign low result: 301
+----- 行数 11271
+diff:[[-9, 3]] ToDifSign:[3, 0]
+Signal Updated:  VV [5, 0]
+Sign low result: 301
+----- 行数 11273
+Sign low result: 503
+----- 行数 11275
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [6, 0]
+Sign low result: 302
+----- 行数 11279
+Sign low result: 503
+----- 行数 11281
+diff:[[-11, -3]] ToDifSign:[0, 3]
+Signal Updated:  VV [6, 3]
+Sign low result: -1
+reset in I:11281 Prc:0.585(3.64) AvgLot:11.500000
+----- 行数 11285
+diff:[[-11, 4]] ToDifSign:[4, 0]
+reset in I:11285 Prc:0.585(6.44) AvgLot:12.000000
+Sign High result: 502
+----- 行数 11287
+diff:[[9, -10]] ToDifSign:[0, 10]
+Signal Updated:  VV [0, 10]
+Sign High result: 301
+----- 行数 11289
+Sign High result: 503
+----- 行数 11291
+Sign High result: 503
+----- 行数 11293
+diff:[[11, -9]] ToDifSign:[0, 9]
+Signal Updated:  VV [0, 19]
+Sign High result: 301
+----- 行数 11295
+Sign High result: 503
+----- 行数 11297
+diff:[[9, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 20]
+Sign High result: 301
+----- 行数 11299
+diff:[[11, -3], [13, 3]] ToDifSign:[0, 3]
+Signal Updated:  VV [0, 23]
+Sign High result: 303
+----- 行数 11301
+Sign High result: 503
+----- 行数 11303
+diff:[[11, -5]] ToDifSign:[0, 5]
+Signal Updated:  VV [0, 28]
+Sign High result: 303
+----- 行数 11305
+Sign High result: 503
+----- 行数 11307
+diff:[[-11, -9]] ToDifSign:[0, 9]
+Signal Updated:  VV [0, 37]
+Sign High result: 303
+----- 行数 11311
+diff:[[11, 3]] ToDifSign:[3, 0]
+Signal Updated:  VV [3, 37]
+Sign High result: 1
+reset in I:11311 Prc:0.57(4.36) AvgLot:12.750000
+----- 行数 11315
+Sign low result: 503
+----- 行数 11317
+Sign low result: 503
+----- 行数 11319
+Sign low result: 503
+----- 行数 11321
+diff:[[11, 5]] ToDifSign:[5, 0]
+Signal Updated:  VV [5, 0]
+Sign low result: 301
+----- 行数 11325
+Sign low result: 503
+----- 行数 11327
+diff:[[-9, 5]] ToDifSign:[5, 0]
+Signal Updated:  VV [10, 0]
+Sign low result: 301
+----- 行数 11329
+Sign low result: 503
+----- 行数 11331
+Sign low result: 503
+----- 行数 11333
+Sign low result: 503
+----- 行数 11335
+diff:[[-11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [11, 0]
+Sign low result: 301
+----- 行数 11337
+Sign low result: 503
+----- 行数 11339
+diff:[[11, 1], [12, 7]] ToDifSign:[2.75, 0]
+Signal Updated:  VV [13.75, 0]
+Sign low result: 303
+----- 行数 11344
+Sign low result: 503
+----- 行数 11346
+diff:[[-9, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [14.75, 0]
+Sign low result: 303
+----- 行数 11348
+diff:[[-11, -3]] ToDifSign:[0, 3]
+Signal Updated:  VV [14.75, 3]
+Sign low result: -1
+reset in I:11348 Prc:0.575(4.36) AvgLot:11.250000
+----- 行数 11352
+reset in I:11352 Prc:0.575(4.36) AvgLot:11.250000
+Sign High result: 502
+----- 行数 11354
+diff:[[11, 8]] ToDifSign:[8, 0]
+reset in I:11354 Prc:0.585(-3.8) AvgLot:10.375000
+Sign High result: 502
+----- 行数 11358
+reset in I:11358 Prc:0.585(-3.64) AvgLot:10.625000
+Sign High result: 502
+----- 行数 11360
+diff:[[-11, 1]] ToDifSign:[1, 0]
+reset in I:11360 Prc:0.585(-2.94) AvgLot:10.750000
+Sign High result: 502
+----- 行数 11362
+reset in I:11362 Prc:0.585(-2.94) AvgLot:10.750000
+Sign High result: 502
+----- 行数 11364
+diff:[[-13, 15]] ToDifSign:[1.875, 0]
+reset in I:11364 Prc:0.585(-1.74) AvgLot:12.625000
+Sign High result: 502
+----- 行数 11366
+diff:[[-14, -15], [-13, -25], [-12, -6], [-11, -7]] ToDifSign:[0, 11.625]
+Signal Updated:  VV [0, 11.625]
+Sign High result: 301
+----- 行数 11373
+diff:[[8, -2]] ToDifSign:[0, 2]
+Signal Updated:  VV [0, 13.625]
+Sign High result: 301
+----- 行数 11375
+Sign High result: 503
+----- 行数 11377
+diff:[[12, -10]] ToDifSign:[0, 2.5]
+Signal Updated:  VV [0, 16.125]
+Sign High result: 301
+----- 行数 11379
+diff:[[12, -9], [13, 9]] ToDifSign:[1.125, 2.25]
+Signal Updated:  VV [1.125, 18.375]
+Sign High result: 1
+reset in I:11379 Prc:0.56(10.84) AvgLot:15.125000
+----- 行数 11381
+diff:[[-12, -14], [-11, -11]] ToDifSign:[0, 14.5]
+reset in I:11381 Prc:0.555(10.8) AvgLot:26.750000
+Sign low result: 502
+----- 行数 11387
+diff:[[8, -2], [11, 2]] ToDifSign:[0.2, 0.2]
+reset in I:11387 Prc:0.545(13.88) AvgLot:25.250000
+Sign low result: 502
+----- 行数 11389
+diff:[[11, 3]] ToDifSign:[3, 0]
+Signal Updated:  VV [3, 0]
+Sign low result: 301
+----- 行数 11393
+diff:[[-11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [4, 0]
+Sign low result: 301
+----- 行数 11395
+Sign low result: 503
+----- 行数 11397
+diff:[[9, -2]] ToDifSign:[0, 2]
+Signal Updated:  VV [4, 2]
+Sign low result: 301
+----- 行数 11399
+diff:[[9, -2]] ToDifSign:[0, 2]
+Signal Updated:  VV [4, 4]
+Sign low result: 302
+----- 行数 11401
+Sign low result: 503
+----- 行数 11403
+Sign low result: 503
+----- 行数 11405
+diff:[[-11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [5, 4]
+Sign low result: 302
+----- 行数 11407
+Sign low result: 503
+----- 行数 11409
+diff:[[11, 3]] ToDifSign:[3, 0]
+Signal Updated:  VV [8, 4]
+Sign low result: 302
+----- 行数 11413
+Sign low result: 503
+----- 行数 11415
+diff:[[-11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [8, 5]
+Sign low result: 302
+----- 行数 11417
+diff:[[-11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [8, 6]
+Sign low result: 302
+----- 行数 11419
+Sign low result: 503
+----- 行数 11421
+Sign low result: 503
+----- 行数 11423
+diff:[[11, 4], [12, 6]] ToDifSign:[5.5, 0]
+Signal Updated:  VV [13.5, 6]
+Sign low result: 302
+----- 行数 11428
+diff:[[-11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [14.5, 6]
+Sign low result: 302
+----- 行数 11430
+diff:[[-11, 5]] ToDifSign:[5, 0]
+Signal Updated:  VV [19.5, 6]
+Sign low result: -1
+reset in I:11430 Prc:0.565(0.46) AvgLot:13.000000
+----- 行数 11432
+diff:[[-11, 2]] ToDifSign:[2, 0]
+reset in I:11432 Prc:0.565(1.86) AvgLot:13.250000
+Sign High result: 502
+----- 行数 11434
+diff:[[-11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 1]
+Sign High result: 301
+----- 行数 11436
+diff:[[-9, 1]] ToDifSign:[1, 0]
+reset in I:11436 Prc:0.57(-7.28) AvgLot:9.625000
+Sign High result: 502
+----- 行数 11438
+reset in I:11438 Prc:0.57(-6.88) AvgLot:10.250000
+Sign High result: 502
+----- 行数 11440
+reset in I:11440 Prc:0.57(-6.88) AvgLot:10.250000
+Sign High result: 502
+----- 行数 11442
+diff:[[-12, -1], [-11, 1]] ToDifSign:[1, 0]
+reset in I:11442 Prc:0.57(-6.34) AvgLot:10.250000
+Sign High result: 502
+----- 行数 11444
+Sign High result: 503
+----- 行数 11446
+Sign High result: 503
+----- 行数 11448
+Sign High result: 503
+----- 行数 11450
+diff:[[11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 1]
+Sign High result: 301
+----- 行数 11452
+diff:[[11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 2]
+Sign High result: 301
+----- 行数 11454
+Sign High result: 503
+----- 行数 11456
+Sign High result: 503
+----- 行数 11458
+Sign High result: 503
+----- 行数 11460
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [1, 2]
+Sign High result: 301
+----- 行数 11464
+Sign High result: 503
+----- 行数 11466
+diff:[[11, -3]] ToDifSign:[0, 3]
+Signal Updated:  VV [1, 5]
+Sign High result: 302
+----- 行数 11468
+Sign High result: 503
+----- 行数 11470
+Sign High result: 503
+----- 行数 11472
+Sign High result: 503
+----- 行数 11474
+diff:[[-11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [2, 5]
+Sign High result: 302
+----- 行数 11476
+diff:[[-9, 1]] ToDifSign:[1, 0]
+reset in I:11476 Prc:0.575(-11.64) AvgLot:8.125000
+Sign High result: 502
+----- 行数 11478
+reset in I:11478 Prc:0.575(-11.64) AvgLot:8.125000
+Sign High result: 502
+----- 行数 11480
+diff:[[-11, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 1]
+Sign High result: 301
+----- 行数 11484
+Sign High result: 503
+----- 行数 11486
+diff:[[-11, -3]] ToDifSign:[0, 3]
+Signal Updated:  VV [0, 4]
+Sign High result: 301
+----- 行数 11490
+diff:[[-9, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [1, 4]
+Sign High result: 301
+----- 行数 11492
+diff:[[-11, -11]] ToDifSign:[0, 11]
+Signal Updated:  VV [1, 15]
+Sign High result: 1
+reset in I:11492 Prc:0.555(4.12) AvgLot:14.750000
+----- 行数 11496
+diff:[[-13, -58], [-12, -9], [-11, -8]] ToDifSign:[0, 17.5]
+reset in I:11496 Prc:0.525(32.16) AvgLot:27.500000
+Sign low result: 502
+----- 行数 11502
+diff:[[11, 2]] ToDifSign:[2, 0]
+Signal Updated:  VV [2, 0]
+Sign low result: 301
+----- 行数 11506
+Sign low result: 503
+----- 行数 11508
+diff:[[11, 4]] ToDifSign:[4, 0]
+Signal Updated:  VV [6, 0]
+Sign low result: 301
+----- 行数 11512
+diff:[[11, 4]] ToDifSign:[4, 0]
+Signal Updated:  VV [10, 0]
+Sign low result: 301
+----- 行数 11516
+diff:[[-13, -15]] ToDifSign:[0, 1.875]
+Signal Updated:  VV [10, 1.875]
+Sign low result: 302
+----- 行数 11518
+diff:[[11, 4]] ToDifSign:[4, 0]
+Signal Updated:  VV [14, 1.875]
+Sign low result: 302
+----- 行数 11522
+Sign low result: 503
+----- 行数 11524
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [15, 1.875]
+Sign low result: 302
+----- 行数 11528
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [16, 1.875]
+Sign low result: 302
+----- 行数 11532
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [17, 1.875]
+Sign low result: 302
+----- 行数 11536
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [18, 1.875]
+Sign low result: 302
+----- 行数 11540
+diff:[[-12, -2], [-11, 2]] ToDifSign:[2, 0]
+Signal Updated:  VV [20, 1.875]
+Sign low result: 302
+----- 行数 11542
+Sign low result: 503
+----- 行数 11544
+diff:[[-11, -2], [11, 3]] ToDifSign:[3, 2]
+Signal Updated:  VV [23, 3.875]
+Sign low result: 302
+----- 行数 11549
+diff:[[11, 5]] ToDifSign:[5, 0]
+Signal Updated:  VV [28, 3.875]
+Sign low result: -1
+reset in I:11549 Prc:0.525(49.0) AvgLot:24.250000
+----- 行数 11553
+diff:[[11, 1]] ToDifSign:[1, 0]
+reset in I:11553 Prc:0.525(49.7) AvgLot:24.125000
+Sign High result: 502
+----- 行数 11557
+diff:[[-11, 25]] ToDifSign:[25, 0]
+reset in I:11557 Prc:0.525(67.2) AvgLot:27.250000
+Sign High result: 502
+----- 行数 11559
+diff:[[11, 3]] ToDifSign:[3, 0]
+reset in I:11559 Prc:0.545(15.28) AvgLot:31.250000
+Sign High result: 502
+----- 行数 11563
+Sign High result: 503
+----- 行数 11565
+diff:[[11, -2]] ToDifSign:[0, 2]
+Signal Updated:  VV [0, 2]
+Sign High result: 301
+----- 行数 11567
+Sign High result: 503
+----- 行数 11569
+Sign High result: 503
+----- 行数 11571
+Sign High result: 503
+----- 行数 11573
+Sign High result: 503
+----- 行数 11575
+diff:[[8, -1]] ToDifSign:[0, 1]
+Signal Updated:  VV [0, 3]
+Sign High result: 301
+----- 行数 11577
+Sign High result: 503
+----- 行数 11579
+Sign High result: 503
+----- 行数 11581
+Sign High result: 503
+----- 行数 11583
+Sign High result: 503
+----- 行数 11585
+Sign High result: 503
+----- 行数 11587
+diff:[[-11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [1, 3]
+Sign High result: 301
+----- 行数 11589
+diff:[[-14, -202], [-13, -117], [-12, -53], [-11, -3]] ToDifSign:[0, 43.5]
+Signal Updated:  VV [1, 46.5]
+Sign High result: 1
+reset in I:11589 Prc:0.4975(-22.7) AvgLot:7.000000
+----- 行数 11597
+diff:[[11, 1]] ToDifSign:[1, 0]
+Signal Updated:  VV [1, 0]
+Sign low result: 301
+DumpCoreHisty:
+11208 : 0.61(-5.08),-5.74%
+11261 : 0.575(7.26),1.74%
+11285 : 0.585(6.44),-2.56%
+11311 : 0.57(4.36),2.63%
+11364 : 0.585(-1.74),-6.84%
+11387 : 0.545(13.88),5.5%
+11478 : 0.575(-11.64),-8.7%
+11496 : 0.525(32.16),3.81%
+11559 : 0.545(15.28)
