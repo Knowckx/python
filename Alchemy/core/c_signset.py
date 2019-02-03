@@ -18,7 +18,8 @@ class Signal:
         self.Cnt = 0 # 目前记录的次数
         self.Open = True #是否起效
 
-        print("reset in I:%d Prc:%s AvgLot:%f"%(book.HisI,book.NewV,self.Limit))
+        print("reset in I:%d Prc:%s AvgLot:%f"%
+        (book.HisI,book.NewV,self.Limit))
     # def Sync(self,dif,newV):
     #     self.Dif = dif
     #     self.NewV = newV
@@ -73,7 +74,7 @@ class Signal:
                 return 1 #卖
         if self.Flag < 0:
             if (bid - ask) >= self.Limit*f:
-                return -1 #买
+                return 1 #买
         return 300 #就是还没满足条件
 
 #判断标准1

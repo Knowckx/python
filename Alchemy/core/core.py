@@ -1,5 +1,6 @@
-from Alchemy.core import c_signset,c_book
+from Alchemy.core import c_signset,c_book,c_box
 from bookut import utlist
+
 
 
 class Core:
@@ -7,7 +8,9 @@ class Core:
         # self.MaxGap = maxGap
         self.SignH = c_signset.Signal(1)
         self.SignL = c_signset.Signal(-1)
+        self.Box = c_box.CBox()
         self.histyL = [] # 记录历史上的决策
+        # self.Str = ["High","Low"]
 
     def PutNew(self,bookL,HisI):
         self.Book = c_book.CBook(bookL,HisI)
@@ -18,36 +21,33 @@ class Core:
             self.SignL.Reset(self.Book)
             return
 
-        k = self.UpdateH()
-        if k == -1:#H先reset，会导致L会更新此次
-            return
-        self.UpdateL()
-        # print('prc %s  his: %s %s'%(self.Nprc,self.Low,self.High))
+        for Type in [-1,1]:
+            code = self.Update(Type)
+            if code == 1:
+                break
 
-     # 峰值，要不要sell?
-    def UpdateH(self):
-        # self.SignH.Sync(self.Book)
-        statusCode = self.SignH.Update(self.Book) # 判断..
-        if statusCode == 501: #Signal is Closed
-            return 
-        print("Sign High result:",statusCode)
-        if statusCode == 1:  # 确定是个高点回落信号
-            self.addHis(self.SignH.GetHisEx())
-            self.SignH.Close()
-            self.SignL.Reset(self.Book)
-            return -1
+    def Update(self,Type):
+        sighSetA,sighSetB = self.SignH,self.SignL
+        strA,strB = "High","Low"
+        if Type == -1:
+            sighSetA,sighSetB = sighSetB,sighSetA
+            strA,strB = strB,strA
+        print("SignSet %s:"%(strA))
+        statusCode = sighSetA.Update(self.Book) # 判断..
+        if statusCode == 501 or statusCode == 502: #Signal is Closed || reset
+            return None
 
-    # 低值，要不要buy?
-    def UpdateL(self):
-        # self.SignH.Sync(self.diff,self.NewV)
-        statusCode = self.SignL.Update(self.Book)
-        if statusCode == 501: #Signal is Closed
-            return
-        print("Sign low result:",statusCode)
-        if statusCode == -1:
-            self.addHis(self.SignL.GetHisEx())
-            self.SignL.Close()
-            self.SignH.Reset(self.Book)
+        print("result:%d"%(statusCode))
+        if statusCode == 1:  # 确定是个信号
+            ii,vv = sighSetA.GetHisEx()
+            sighSetA.Close()
+            sighSetB.Reset(self.Book)
+
+            if self.CheckBox(vv):
+                print("Box say no")
+                return None
+            self.addHis([ii,vv])
+            return 1
 
     # def PrintStatus(self):
     #     print("high and low:",self.High,self.Low)
@@ -70,7 +70,10 @@ class Core:
             if len(his) == 3:
                 ss= '%s,%s%%' % (ss,his[2])
             print(ss)
-            
+    
+    def CheckBox(self,vv):
+        return self.Box.NewValue(vv.V())
+
 
 # 两数差值的百分比
 def GetDifPst(v1,v2):
