@@ -74,7 +74,7 @@ class mean:
     def __str__(self):
         return self.String()
 
-    def String(self):
+    def String(self): 
         # ss = '%.4f,%.3f' % (self.prc,self.lots)
         prc =round(self.prc,5)
         lots =round(self.lots,5)

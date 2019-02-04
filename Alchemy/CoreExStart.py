@@ -5,14 +5,12 @@ import sys
 
 #back test in excel.
 def Start():
-    stdout = sys.stdout
-    doc = open('Alchemy\log.txt','w', encoding='utf-8')
-    sys.stdout=doc
+
 
     tCore = core.Core()
     ex.InitSht()
     # start = 3500
-    start = 9700
+    start = 9731
 
     # end  = 3700
 
@@ -31,8 +29,8 @@ def Start():
         tCore.PutNew(bookL,i)
 
     tCore.DumpHisty()
-    sys.stdout= stdout
-    doc.close()
+    # sys.stdout= stdout
+    # doc.close()
 
 
 Start()
