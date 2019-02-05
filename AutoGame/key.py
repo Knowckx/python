@@ -1,61 +1,32 @@
-#自动按键
-
 import keyboard
 import time
 
 isLoop = True
-
 cd = 0.25
-
 
 def StartWait():
     global isLoop
-
     while True:
-        print("we are waiting")
+        print("waiting for start")
         keyboard.wait("`")
-        # keyboard.send("w")
-        # keyboard.send("q")
         keyboard.on_press_key('`',StopLoop)
-        isLoop =True
+        isLoop = True
         while isLoop:
             LoopContent()
         continue
 
 
-
 def LoopContent():
-    print("loop ing")
-
-
-
-    # keyboard.send("e")
-    # time.sleep(0.25) 
-
-    keyboard.send("w")
-    keyboard.send("q")
-    # keyboard.send("")
-
-    # time.sleep(0.25) 
-    # keyboard.send("r")
-
-    # keyboard.send("A")
-
-    # keyboard.send("r")
-
-
-    keyboard.send("5")
-    keyboard.send("6")
-    # time.sleep(0.25) 
-    # keyboard.send("r")
+    print("looping")
+    keyboard.send("q") # 滚键盘流
+    keyboard.send("w") 
+    keyboard.send("e")
+    # keyboard.send("alt+w") # 释放目标自己（护盾）
+    keyboard.send("4") # 道具  比如科技刀
     time.sleep(cd) 
-
 
 def StopLoop(msg = None):
     global isLoop
     isLoop = False
 
-
 StartWait()
-
-keyboard.send()
