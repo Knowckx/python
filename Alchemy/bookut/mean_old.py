@@ -1,6 +1,5 @@
 
-
-# 新 双维盘面值
+# mean 2.0版本 双维盘面值
 def GetPredictP(book):
     BidL,AskL = book[0],book[1]
     
@@ -85,7 +84,4 @@ class mean:
         return self.prc
 
 
-# a1 = mean(5,10)
-# a2 = mean(5,11)
-# a1 = [a1,5]
-# print('%s at %d' % (a1[0],a1[1]))
+
