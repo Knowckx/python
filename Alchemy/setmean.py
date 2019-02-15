@@ -29,11 +29,12 @@ def Action(book,i):
     # vv = sht.Cells(i, coreCol).Value
 
     #研究下724 726
-setmean()
-# 10692 0.6859540864598352 大
-# 10728 0.6859263581721345 小
+    # 10692 0.6859540864598352 大
+    # 10728 0.6859263581721345 小
 
 
+for target_list in expression_list:
+    pass
 
 
 
