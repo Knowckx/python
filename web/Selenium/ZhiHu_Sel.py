@@ -66,13 +66,13 @@ def ConnectDomin():
 def SetCookies_zhihu():
     driver.get('https://www.zhihu.com/question/20298527') #一个404页面
     # driver.delete_all_cookies()
-    cookies = GetCookies.getcookiefromchrome()
+    cookies = GetCookies.GetCookieFromChrome()
     for k,v in cookies.items():
         driver.add_cookie({'name':k, 'value':v})
 def SetCookies_weibo():
     driver.get('http://weibo.com/signup/signup.php') #一个普通页面
     # driver.delete_all_cookies()
-    cookies = GetCookies.getcookiefromchrome(host='.weibo.com')
+    cookies = GetCookies.GetCookieFromChrome(host='.weibo.com')
     for k,v in cookies.items():
         driver.add_cookie({'name':k, 'value':v})
 #-----------------------根据ID提取回答用户的列表

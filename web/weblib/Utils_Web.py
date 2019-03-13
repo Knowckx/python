@@ -4,11 +4,10 @@ sys_path.insert(0,"../utils")
 
 from libs import FileRW
 
-from win32.win32crypt import CryptUnprotectData
 import os,sqlite3,time
 import requests
 import datetime
-
+from . import Cookies
 
 ReqTimeR = datetime.datetime.now()
 
@@ -37,7 +36,7 @@ def LoadStr ():
 
 #最小重复的时间间隔机制
 def LimitTryTimer():
-    minReqTimeSpan = 1 #req之间最小间隔
+    minReqTimeSpan = 3 #req之间最小间隔
     reTryTimeSpan = 0.3 #命中最小间隔内后的等待时间
 
     global ReqTimeR
@@ -73,9 +72,13 @@ def GetUrlData(s,url,encoding = 'utf-8',**kw):
     return r_data  #正常返回json
 
 
+
+def GetCookieFromChrome(cookDomain):
+    return Cookies.GetCookieFromChrome(cookDomain)
+
 #物料准备，返回一个session
 def GetSession(headers,cookDomain):
-    cookies = getcookiefromchrome(cookDomain)
+    cookies = GetCookieFromChrome(cookDomain)
     s = requests.session()
     s.headers = headers
     s.cookies = requests.utils.cookiejar_from_dict(cookies)
@@ -102,8 +105,8 @@ def F_List(tarlist,FuncFilter,curCnt = 0):
 
 __name__ = 'main'
 testStr = ''
-if testStr == 'getcookiefromchrome':
-    getcookiefromchrome(typeID = 1)
+if testStr == 'GetCookieFromChrome':
+    GetCookieFromChrome(typeID = 1)
 if testStr == 'GetUrlData':
     url = "https://www.baidu.com/"
     payload = {

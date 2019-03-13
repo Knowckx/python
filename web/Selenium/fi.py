@@ -60,7 +60,7 @@ data = {
     'form_email':'ID',
     'form_password':'mm'
 }
-cookies = GetCookies.getcookiefromchrome('.zhihu.com')
+cookies = GetCookies.GetCookieFromChrome('.zhihu.com')
 global s
 s = requests.session()
 

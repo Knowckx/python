@@ -1,7 +1,5 @@
-
-
-
 import os,sqlite3
+from win32.win32crypt import CryptUnprotectData
 
 #给定站点，找出相应的Cookies
 def GetCookieFromChrome(host='.zhihu.com',typeID = 1):

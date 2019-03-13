@@ -1,12 +1,10 @@
 # from sys import path as sys_path  #为了加载一个Utlity~容易么我。
 # sys_path.insert(0,"../Utlity")
-# import FileRW
 
 import requests
 from lxml import etree
 import math,codecs,json
-import Utils_Web,FileRW
-
+import web.weblib.Utils_Web as Utils_Web
 
 
 
@@ -33,10 +31,10 @@ def get_commetList(weiboID,mode=111):
     if ResL!= None:
         idList.extend(ResL)
 
-    zan_url = 'http://m.weibo.cn/api/attitudes/show'
-    ResL = getIDList_Att(zan_url,weiboID)
-    if ResL!= None:
-        idList.extend(ResL)
+    # zan_url = 'http://m.weibo.cn/api/attitudes/show'
+    # ResL = getIDList_Att(zan_url,weiboID)
+    # if ResL!= None:
+    #     idList.extend(ResL)
 
     print("相加总数：%s"%len(idList))
     idList = list(set(idList))
@@ -95,11 +93,12 @@ def getIDList_Att(url,weiboID):
         else:
             print('返回的JSON拿不到data字段，结束')
             break  
-        page_number =  len(jsonData['data']) #本页点赞总数
-        print("点赞页：%s。 本页数量：%s"%(pageCnt,page_number))
-        if page_number == 0:
+        if jsonData['data'] == None:
             print('点赞页完成，总页数：'+ str(pageCnt-1))
             break
+        page_number =  len(jsonData['data']) #本页点赞总数
+        print("点赞页：%s。 本页数量：%s"%(pageCnt,page_number))
+
         for k in jsonData['data']:  #每一页  这里的结构，被改掉了。 目前返回一个html. <a href="/u/2369434535">
             userid =  k['user']['id']
             idList.append(userid)
@@ -118,7 +117,7 @@ def get_userInfo(userID):
         'type':'1', 
         'callback':'STK_1493021223253208'
         }
-    cookies1 = Utils_Web.getcookiefromchrome('.weibo.com') 
+    cookies1 = Utils_Web.GetCookieFromChrome('.weibo.com') 
     dataStr = Utils_Web.GetUrlData(s,url,encoding = 'unicode_escape',params = payload,headers = headers_weibo,cookies = cookies1) #需要换header 换cookies
     index1 = dataStr.find('<div')
     if(index1 == -1):
@@ -155,9 +154,9 @@ def get_userInfo(userID):
 #---------判断一个用户是不是目标
 def F_UserID(userID):
     infoDic = get_userInfo(userID)
-    if infoDic.get('gender') != "女": #后面一定是正确性别
-        print("非目标性别,PASS")
-        return False      
+    # if infoDic.get('gender') != "女": #后面一定是正确性别
+    #     print("非目标性别,PASS")
+    #     return False      
     strLoc = infoDic.get('area')
     if strLoc != None and strLoc.find('深圳') != -1:
         print("------------目标通过------------")
@@ -239,7 +238,7 @@ if __name__ == '__main__':
     if testStr == 'get_comment':  
         lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'GCpgNmeYL'
+        weiboID = 'HkLbXiqQK'
         midCnt = 0
         main(weiboID,midCnt)
 
