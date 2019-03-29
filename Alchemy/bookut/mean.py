@@ -6,7 +6,6 @@ import math
 
 # 向外暴露
 def GetPredictP(book):
-    
     return SSDD(book)
 
 
@@ -17,6 +16,8 @@ def SSDD(book):
     BidL,AskL = book[0],book[1]
     avgLots = utlist.AvgLotL(book[:]) #平均量是多少
     print("avgLots is ",avgLots)
+    if avgLots == 0:
+        return 0
 
     repBidL = GetRepFromLL(BidL,avgLots) #代表价格
     print("repBid is ",repBidL)
@@ -42,6 +43,8 @@ def GetRepPrc(LL,stdLots):
 # 一个数组，给定抽样的量，返回结果集的数组
 def GetSimpleList(LL,N):
     rst = []
+    if N == 0 :
+        return rst
     for i in range(0,len(LL)):
         if LL[i][1] >= N:  #这个位置能搞定了！
             rst.append([LL[i][0],N])
@@ -57,11 +60,16 @@ def GetCenterPrcFromList(LL):
     for i in range(0,len(LL)):
         total = total + LL[i][0]*LL[i][1]
         count = count + LL[i][1]
+    if count ==0:
+        return 0
     rst = total / count
     return rst
 
 # 得到加权后的代表交易量
 def GetRepLots(LL,RepPrc):
+    if RepPrc == 0:
+        return 0
+
     flag = 1
     if LL[0][0] < LL[1][0]:
         flag = -1
@@ -84,6 +92,8 @@ def getPredickt(bidL,askL):
     bidP = bidL[0]
     askLots = askL[1]
     bidLots = bidL[1]
+    if (askLots+bidLots) == 0:
+        return 0
     rPrs = (askP*bidLots+bidP*askLots)/(askLots+bidLots)
     return rPrs
 

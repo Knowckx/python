@@ -14,24 +14,25 @@ BidL1 = []
 def Init():
     global quote_ctx
     quote_ctx = ft.OpenQuoteContext(host='127.0.0.1', port=11111)
-    quote_ctx.start()  
+    quote_ctx.start()
+
 
 def InitSZ(SID):
-    market = ft.Market.SZ
-    ret_code, data = quote_ctx.get_stock_basicinfo(
-        market, ft.SecurityType.STOCK, SID)
-    CheckRetCode(ret_code)
-    FutuUtil.SMap[SID] = data
-    print(SID,data["name"][0])
-
+	pass
+    # market = ft.Market.SZ
+    # ret_code, data = quote_ctx.get_stock_basicinfo(
+    #     market, stock_type=ft.SecurityType.STOCK, SID)
+    # CheckRetCode(ret_code)
+    # FutuUtil.SMap[SID] = data
+    # print(SID,data["name"][0])
 
 def InitBasic(SID):
     ret_code, data = quote_ctx.get_stock_basicinfo(
-        ft.Market.HK, SecurityType.STOCK, SID)
+        ft.Market.HK, ft.SecurityType.STOCK, SID)
 
     CheckRetCode(ret_code)
     FutuUtil.SMap[SID] = data
-    print(SID,data["name"][0])
+    print(SID, data["name"][0])
 
 
 def Subs(SID):
@@ -44,11 +45,12 @@ def Subs(SID):
 
 # 回调 摆盘
 def HandleBook(data):
-    global AskL1,BidL1
-    data = FutuUtil.CleanBookData(data)
+    global AskL1, BidL1
+    data = FutuUtil.CleanBookData(data) 
+
     nb = CBook.Book(data)
     df = nb.ToDF()
-    rstDiff = nb.GetDiff(AskL1,BidL1)
+    # rstDiff = nb.GetDiff(AskL1, BidL1)
     AskL1 = data["Ask"][:5]
     BidL1 = data["Bid"][:5]
     SID = data["code"]
@@ -58,12 +60,11 @@ def HandleBook(data):
     # recordData(df, SID)
 
 
-
-
 # 回调 Ticker
 def HandleTicker(data=None):
-    SID = data["code"][0]
-    data = FutuUtil.CleanTickerData(data)
+	pass
+    # SID = data["code"][0]
+    # data = FutuUtil.CleanTickerData(data)
     # if data["lots"][0] > 5:
     #     print(data)
 #     print(data)
@@ -81,4 +82,3 @@ def recordData(data, SID):
     fPath = 'Docs/csv/' + SID + '_' + stoday + '.csv'
     data.to_csv(fPath, mode='a')
     # FileRW.Afile(fPath, str(data)+"\n")
-

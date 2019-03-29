@@ -10,7 +10,7 @@ class Book:
         self.AskL = FutuBook["Ask"]
         self.BidL = FutuBook["Bid"]
         self.Mean = mean.GetPredictP([self.BidL[:5],self.AskL[:5]])
-        self.Book1 = CBook([FutuBook["Bid"][:],FutuBook["Ask"][:]],0)
+        # self.Book1 = CBook([FutuBook["Bid"][:],FutuBook["Ask"][:]],0)
 
     def ToDF(self):
         df = pd.DataFrame()
