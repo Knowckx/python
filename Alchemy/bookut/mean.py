@@ -82,7 +82,8 @@ def GetRepLots(LL,RepPrc):
         theLots = LL[i][1]*factor # 本次加权的交易量
         totalLots = totalLots + theLots
         if flag == -1:
-            print(difPrc,vx,factor,LL[i][1],theLots)
+            pass
+            # print(difPrc,vx,factor,LL[i][1],theLots)
     return totalLots
 
 
