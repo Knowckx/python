@@ -17,19 +17,11 @@ def Init():
     quote_ctx.start()
 
 
-def InitSZ(SID):
-	pass
-    # market = ft.Market.SZ
-    # ret_code, data = quote_ctx.get_stock_basicinfo(
-    #     market, stock_type=ft.SecurityType.STOCK, SID)
-    # CheckRetCode(ret_code)
-    # FutuUtil.SMap[SID] = data
-    # print(SID,data["name"][0])
-
-def InitBasic(SID):
-    ret_code, data = quote_ctx.get_stock_basicinfo(
-        ft.Market.HK, ft.SecurityType.STOCK, SID)
-
+def InitBasic(SID,flag = "HK"):
+    market = ft.Market.HK
+    if flag == "SZ":
+        flag = ft.Market.SZ
+    ret_code, data = quote_ctx.get_stock_basicinfo(market, ft.SecurityType.STOCK, SID)
     CheckRetCode(ret_code)
     FutuUtil.SMap[SID] = data
     print(SID, data["name"][0])

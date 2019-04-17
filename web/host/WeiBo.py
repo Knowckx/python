@@ -198,7 +198,7 @@ def murl_to_mid(murl):
 #----------------------------------主启动
 
 
-def main(weiboID = 'GCpgNmeYL' , midCnt = 0):
+def main(weiboID = 'Hp0vQjVbx' , midCnt = 0):
     tarlist = []  #保存最后的结果
     # if (not ToJsonData_Q(questionID)):  #先判断是否存在已经
     #     return

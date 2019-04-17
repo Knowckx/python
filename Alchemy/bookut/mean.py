@@ -15,17 +15,17 @@ def GetPredictP(book):
 def SSDD(book):
     BidL,AskL = book[0],book[1]
     avgLots = utlist.AvgLotL(book[:]) #平均量是多少
-    print("avgLots is ",avgLots)
+    # print("avgLots is ",avgLots)
     if avgLots == 0:
         return 0
 
     repBidL = GetRepFromLL(BidL,avgLots) #代表价格
-    print("repBid is ",repBidL)
+    # print("repBid is ",repBidL)
     repAskL = GetRepFromLL(AskL,avgLots)
-    print("repAsk is ",repAskL)
+    # print("repAsk is ",repAskL)
 
     rst = getPredickt(repBidL,repAskL)
-    print("mean is ",rst)
+    # print("mean is ",rst)
     return rst
 
 # 取得代表值和代表量
