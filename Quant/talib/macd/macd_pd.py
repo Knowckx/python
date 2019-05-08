@@ -18,6 +18,13 @@ def get_MACD(df,short=12,long=26,mid=9):
     df['macd']=2*(df['diff']-df['dea'])
     return df
 
+def get_MACD_old(df,short=12,long=26,mid=9):
+    df["sema"] = pd.ewma(df["close"],span=short1)
+    df["lema"] = pd.ewma(df["close"],span=long1) 
+    df['diff'] = pd.Series(df["sema"])-pd.Series(df["lema"])
+    df["dea"] = pd.ewma(df["diff"],span=mid)
+    df['macd']=2*(df['diff']-df['dea'])
+
 start = time.time()
 get_MACD(df)
 end = time.time()
