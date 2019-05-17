@@ -5,10 +5,9 @@ import futu as ft
 from libs import date
 
 
+
 quote_ctx = 1  # 全局的连接上下文
 
-AskL1 = []
-BidL1 = []
 
 
 def Init():
@@ -37,18 +36,13 @@ def Subs(SID):
 
 # 回调 摆盘
 def HandleBook(data):
-    global AskL1, BidL1
     data = FutuUtil.CleanBookData(data) 
 
     nb = CBook.Book(data)
     df = nb.ToDF()
-    # rstDiff = nb.GetDiff(AskL1, BidL1)
-    AskL1 = data["Ask"][:5]
-    BidL1 = data["Bid"][:5]
-    SID = data["code"]
     print(df)
-    # if rstDiff !="":
-    #     print(df['core'][0],"diff:",rstDiff)
+    rstDiff = nb.GetDiff()
+    # print(rstDiff)
     # recordData(df, SID)
 
 
@@ -65,8 +59,7 @@ def HandleTicker(data=None):
 
 def CheckRetCode(ret_code):
     if ret_code != ft.RET_OK:
-        print("error, msg: %s" % data)
-        sys.exit()
+        print("error, msg: %s" % ret_code)
 
 
 def recordData(data, SID):

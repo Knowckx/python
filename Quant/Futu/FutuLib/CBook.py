@@ -2,15 +2,22 @@
 import pandas as pd
 from Alchemy.bookut import bookdiff,mean
 from  Alchemy.core.c_book import *
+from Alchemy.core import corefunc
+from Alchemy.core import c_TI_BA
+
+
 
 
 class Book:
     def __init__(self, FutuBook):
         self.SID = FutuBook["code"]
-        self.AskL = FutuBook["Ask"]
-        self.BidL = FutuBook["Bid"]
-        self.Mean = mean.GetPredictP([self.BidL[:5],self.AskL[:5]])
+        self.AskL = FutuBook["Ask"][:5]
+        self.BidL = FutuBook["Bid"][:5]
+        self.Mean = mean.GetPredictP([self.BidL,self.AskL])
         # self.Book1 = CBook([FutuBook["Bid"][:],FutuBook["Ask"][:]],0)
+        self.SignBA = c_TI_BA.TIBA(20)
+
+
 
     def ToDF(self):
         df = pd.DataFrame()
@@ -23,15 +30,18 @@ class Book:
             df['Ask'+str(i+1)] = [s]
         return df
 
-    def GetDiff(self,AskL1,BidL1):
-        return self.Book1.DifL
-        # if len(AskL1) == 0:
-        #     return ""
-        # rstDiff = bookdiff.Start(AskL1,BidL1,self.AskL[:5],self.BidL[:5])
-        # DiffL = bookdiff.ScreenRst(rstDiff[:])
-        # if len(DiffL) ==0:
-        #     DiffL = ""
-        # return DiffL
+    def GetDiff(self):
+        bookL = []
+        bookL.append(self.BidL)
+        bookL.append(self.AskL)
+        DifL = corefunc.difToSignal(bookL[:]) 
+        self.SignBA.Add(DifL)
+        self.SignBA.Print()
+        return 
+
+    def Static(self):
+
+
 
 def ListToStr(ins):
     for i in range(0, len(ins)):

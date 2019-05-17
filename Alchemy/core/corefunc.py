@@ -27,7 +27,7 @@ def difToSignal(bookL):
     if rst[0] == rst[1]: #[-11, -26], [11, 26] 这种情况，是多空同时增量力量
         rst = [c/10 for c in rst]
         
-    print('diff:%s ToDifSign:%s'%(difL[:],rst))
+    # print('diff:%s ToDifSign:%s'%(difL[:],rst))
     return rst
 
 def isZero(dif):
