@@ -15,7 +15,7 @@ class TIBA:
     def Print(self):
         print("A:%f B:%f C:%f"%(self.LineA.V(),self.LineB.V(),self.LineC.V()))
 
-    
+
 
 class TIBA_Base:
     def __init__(self,CntLimit):
