@@ -22,7 +22,7 @@ def LotSizeinList(orders,size):
     outs = []
     for order in orders:  # [(1.02, 148000, 20),.....]
         out = list(order)
-        # out[1] = int(out[1]/size)
+        out[1] = int(out[1]/size)
         out.pop()   # 最后一项目前订单数量不要了
         outs.append(out)
     return outs

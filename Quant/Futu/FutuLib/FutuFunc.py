@@ -3,10 +3,12 @@ from . import FutuUtil, FutuClass
 from . import CBook
 import futu as ft
 from libs import date
-
+from Alchemy.core import c_TI_BA
 
 
 quote_ctx = 1  # 全局的连接上下文
+
+SignBA = c_TI_BA.TIBA(20)
 
 
 
@@ -37,11 +39,13 @@ def Subs(SID):
 # 回调 摆盘
 def HandleBook(data):
     data = FutuUtil.CleanBookData(data) 
-
     nb = CBook.Book(data)
     df = nb.ToDF()
     print(df)
-    rstDiff = nb.GetDiff()
+    DifL = nb.GetDiff()
+    print('Ticket Dif:%s'%(DifL))
+    SignBA.Add(DifL)
+    SignBA.Print()
     # print(rstDiff)
     # recordData(df, SID)
 

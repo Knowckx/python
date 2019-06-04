@@ -7,8 +7,9 @@ import futu as ft
 from libs import FileRW
 
 def StartStockTick():
-    # StockID = 'SZ.002376'  
-    SID = 'SZ.000776'  
+    # SID = 'SZ.000776' 
+    SID = 'HK.00700'  
+
     FutuFunc.InitBasic(SID)
     FutuFunc.Subs(SID)
 
