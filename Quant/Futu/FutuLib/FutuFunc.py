@@ -40,14 +40,14 @@ def Subs(SID):
 def HandleBook(data):
     data = FutuUtil.CleanBookData(data) 
     nb = CBook.Book(data)
+    DifL = nb.GetDiff()
+    if DifL == None:
+        return
     df = nb.ToDF()
     print(df)
-    DifL = nb.GetDiff()
     print('Ticket Dif:%s'%(DifL))
     SignBA.Add(DifL)
     SignBA.Print()
-    # print(rstDiff)
-    # recordData(df, SID)
 
 
 # 回调 Ticker

@@ -19,13 +19,13 @@ class Book:
 
     def ToDF(self):
         df = pd.DataFrame()
-        for i in range(5, 0,-1):
+        for i in range(3, 0,-1): # 5 -> 3
             s = self.BidL[i-1]
             df['Bid'+str(i)] = [s]
-        for i in range(0, 5):
+        df['core'] = self.Mean
+        for i in range(0, 3):
             s = self.AskL[i]
             df['Ask'+str(i+1)] = [s]
-        df['core'] = self.Mean
         return df
 
     def GetDiff(self):
