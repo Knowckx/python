@@ -40,6 +40,7 @@ class Book:
         return 
 
     def Static(self):
+        pass
 
 
 

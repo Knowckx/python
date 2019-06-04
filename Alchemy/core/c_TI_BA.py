@@ -2,12 +2,14 @@
 # TIBA_Base   Technical index - Bid / Ask
 
 class TIBA:
-    def __init__(self,):
+    def __init__(self,cnt):
         self.LineA = TIBA_Base(cnt)
         self.LineB = TIBA_Base(cnt*5)
         self.LineC = TIBA_Base(cnt*5*5)
     
     def Add(self,dd):
+        if dd == None: # 3.过滤diff为0的盘面
+            return
         self.LineA.Add(dd)
         self.LineB.Add(dd)
         self.LineC.Add(dd)
@@ -32,23 +34,26 @@ class TIBA_Base:
             self.VV[0] = self.VV[0] - tailv[0]
             self.VV[1] = self.VV[1] - tailv[1]              
             self.HisLL.pop(0)
-        print(self.VV)
-        print(self.HisLL)
+        # print(self.VV)
+        # print(self.HisLL)
     
     def V(self):
+        if self.VV[1] == 0:
+            return 0
         return round(self.VV[0]/self.VV[1],2)
+        
 
-def TestSign2():
-    a1 = [1,1]
-    a2 = [2,2]
-    a3 = [0,3]
-    a4 = [0,4]
-    a5 = [0,5]
-    testsign = TIBA_Base(3)
-    testsign.Add(a1)
-    testsign.Add(a2)
-    testsign.Add(a3)
-    testsign.Add(a4)
-    testsign.Add(a5)
+# def TestSign2():
+#     a1 = [1,1]
+#     a2 = [2,2]
+#     a3 = [0,3]
+#     a4 = [0,4]
+#     a5 = [0,5]
+#     testsign = TIBA_Base(3)
+#     testsign.Add(a1)
+#     testsign.Add(a2)
+#     testsign.Add(a3)
+#     testsign.Add(a4)
+#     testsign.Add(a5)
 
-TestSign2()
+# TestSign2()

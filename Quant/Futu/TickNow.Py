@@ -8,7 +8,7 @@ from libs import FileRW
 
 def StartStockTick():
     # StockID = 'SZ.002376'  
-    SID = 'SH.601339'  
+    SID = 'SZ.000776'  
     FutuFunc.InitBasic(SID)
     FutuFunc.Subs(SID)
 
