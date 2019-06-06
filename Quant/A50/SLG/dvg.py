@@ -132,7 +132,7 @@ def GetPointA(df):
     return -1
 
 
-# macd 转折点？
+# macd 出现转折点                                                                                                                                                                                                                     
 # 1 = P99 va -1 = P0 va 0 = none type
 def AstPostionType(df):
     li = df['macd']
