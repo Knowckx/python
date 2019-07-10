@@ -1,162 +1,142 @@
 import pandas as pd
 
-import Quant.A50.csvdata as  csvdata
+import Quant.A50.csvdata as csvdata
 
 '''
 Divergence   [daɪˈvɜːrdʒəns] 
 分歧 背离
 '''
+# -----------------Main Start-----------------
 
 
-def F_MACD_TypeA(st,grade):
-    # print("grade %s"% grade)
-    df = libut.get_MACD(st,grade)
-    if len(df.index) < 100:
-        return -1
-    # print(df[-20:])
-    idxA = GetPointA(df)
-    if idxA == -1:
-        return -2
-    #点A OK
-    idxB = GetPointB(df,idxA)
-    if idxB == -1:
-        return -3
-    # print("A:%s B:%s"%(df.loc[idxA,'time'],df.loc[idxB,'time']))
-    if idxA - idxB > 50: #A点和B点相距太远的。算了
-        return -4
-    return CheckAB(st,grade,df,idxB,idxA)
-
-# 检查AB两点是否满足要求
-def CheckAB(st,grade,df,idxB,idxA):
-    PA = df.loc[idxA,'close']
-    PB = df.loc[idxB,'close']
-    MD_A = df.loc[idxA,'macd']
-    MD_B = df.loc[idxB,'macd']
-
-    if (PA > PB) or MD_A < MD_B:
-        return -5
-    
-    if (PB-PA)/PA*100 < 2.0: #AB差 新低/新高要明显
-        return -6
-    
-    # Dif_A = df.loc[idxA,'dif']
-    # Dif_B = df.loc[idxB,'dif']
-    # if Dif_B >= Dif_A:
-    #     return -7
-    Dif_A = df.loc[idxA,'dea']
-    Dif_B = df.loc[idxB,'dea']
-    if Dif_B >= Dif_A:
-        return -7
-    
-    prcNow = libut.GetPrcNow(st)
-    rate = (PB - prcNow)/PB*100
-    # if rate > 2:
-    #     return -8
-    print("---------result %s %s"%(st,grade))
-    print("PointB  %s"%(df.loc[idxB,'time']))
-    print("PointA  %s"%(df.loc[idxA,'time']))
-    print('profit space:%.2f' % rate)
-    # if (len(df.index)-idxA)<3:
-    #     print("---- fresh %d X %s"%((len(df.index)-idxA),grade))
-    # elif (len(df.index)-idxA)<6:
-    #     print("-- fresh %d X %s ----"%((len(df.index)-idxA),grade))
-    return True
+# -----------------Main End-----------------
 
 
-
-def GetPointB(df,idxA):
-    indexNow = idxA
-    firstRedCnt = 0  #怕A是个超大绿
-    while (indexNow > 0):
-        vmacd = df.loc[indexNow,'macd'] 
-        if vmacd > 0:
-            break
-        indexNow -= 1
-        firstRedCnt += 1
-    if firstRedCnt > 15:
-        return -1  #放弃找B
-        
-    # 此时idx一定是红的
-    # 找9绿
-    GMAX = 9
-    while (indexNow > 0):
-        indexNow -= 1
-        vmacd = df.loc[indexNow,'macd'] 
-        if vmacd > 0:
+# -----------------Func Start-----------------
+# func1
+def FindNextLeftBlock(macdList, start, minlen):
+    i = start
+    iLe,iRi = -1,-1
+    while i > 0:
+        if macdList[i] >= 0:
+            i -= 1
             continue
-        greenCnt = 1
-        while(greenCnt < GMAX):
-            indexNow -= 1
-            vmacd = df.loc[indexNow,'macd'] 
-            if vmacd > 0:
-                greenCnt = 0
-                break
-            greenCnt += 1
-            # print(df.irow(indexNow))
-            #,df.loc[indexNow,'time'],greenCnt,vmacd
-        if greenCnt != 0:
-            # print("10个哦"+ str(indexNow))
+        tempLe = GetLeftofBlock(macdList, i)
+        if (i+1-tempLe) >= minlen: # OK
+            iLe = tempLe  
+            iRi = i+1
             break
-    dfB9 = df[indexNow:indexNow+GMAX+1]
-    idxB = dfB9['close'].idxmin()
-    
-    # print(df.loc[idxB,'time'])
-    
-    # 因为close最小值可能是背离形式，一个MACD值突然变小的点。
-    # 我们要的是MACD最绿块的那个点。是否要向左挪动？
-    while(True):
-        dfB3 = df[idxB-2:idxB+1]  #最近3条最小,够了。
-        testIdx = dfB3['macd'].idxmin()
-        # print("本次m值最小：%s"% df.loc[testIdx,'time'])
-        if testIdx != idxB:
-            idxB = testIdx
-        else:
-            break
-        # vmacd1,vmacd0 = df.loc[idxB,'macd'],df.loc[idxB-1,'macd']
-        # close1,close0 = df.loc[idxB,'close'],df.loc[idxB-1,'close']
-        # if(vmacd0<=vmacd1 and close0<=close1):
-            # idxB -= 1
+        # invalid Block
+        i = tempLe - 1
+        continue
+    return Block(iLe,iRi)
 
-    # print("Final",idxB,df.loc[idxB,'time'])
-    return idxB
-    
-
-#
-def GetPointA(df):
-    df15 = df[-16:]
-    idx15 = df15['close'].idxmin()
-    df7 = df15[-8:]
-    idx7 = df7['close'].idxmin()
-    if idx7 == idx15:
-        return idx7
+# func1.1 to get the left index of the whole block
+def GetLeftofBlock(macdList, right):
+    i = right
+    while i > 0:
+        if macdList[i] < 0:
+            i -= 1
+            continue
+        # > 0
+        return i+1
+    msg = "GetLeftofBlock Error:Index Out of the Array"
+    print(msg)
     return -1
 
-
-# macd 出现转折点                                                                                                                                                                                                                     
-# 1 = P99 va -1 = P0 va 0 = none type
-def AstPostionType(df):
-    li = df['macd']
-    if li.idxmax() == df.index[-2]:
-        return 1
-    if li.idxmin() == df.index[-2]:
-        return -1
-    return 0
-
-    
-def QTest():
-    df = pd.DataFrame([[0, 2, 3], [0, 4, 1], [10, 20, 30]],columns=['A', 'B', 'C'])
-    print(df.at[1, 'B'])
-    
+# -----------------Func End-----------------
 
 
-def main():
-    m1,m5 = csvdata.GetPDdata()
-    inpd = m1[-5:]
-    inpd.at[inpd.index[-2],'macd'] = 0.1
-    print(inpd)
-    rst = AstPostionType(inpd)
-    print(rst)
+def GetPointL5(df):
+    clList = df['close'][-21:]
+    rst = IsLowestL5(clList)
+    if rst != "":
+        print(rst)
+        return
 
 
-# QTest()
-main()
+def AnalBlockL5(df):
+    mv = df.loc[-1, 'macd']
+    if mv > 0:  # MACD is red
+        pass
+        # return false #TyA
+    # MACD is green Synced
+    maList = df['macd'][-21:]
+    idxL = DigBlock(maList)
+    if idxL == -1:
+        return
+    dfL5 = df[idxL:]
+    blockL5 = Block(dfL5)
+    blockL5.Anal()
+
+
+# P2.1 值和M值是同步的
+def IsPointSyncPM(MV):
+    if MV > 0:  # MACD is red
+        return false
+    return true
+
+
+# P1 长21的close数组
+def IsLowestL5(clList):
+    low21 = clList.idxmin()
+    if low21 == -1:  # P1 OK
+        return ""
+    msg = "close[-1] is not lowest"
+    return msg
+
+
+#　obj represent macd Block 
+class Block:
+    def __init__(self):
+        self.ILe = 0
+        self.IRi = 0
+
+    def __init__(self,left,right):
+        self.ILe = left
+        self.IRi = right
+
+    def Anal(self, df):
+        self.Len = len(self.df)
+        idxp = df.close.idxmin()
+        idxm = df.macd.idxmin()
+        if idxp == idxm:
+            self.dvgUt = DvgUnit(df, idxp)
+            msg = "Block Desc:Single"
+            print(msg)
+            return
+        # Try TyB
+        idxL, idxR = idxm, idxp
+        if idxL > idxR:
+            idxL, idxR = idxR, idxL
+        dvgSet = DvgSet(df, idxL, idxR)
+        self.TypeB = devSet.IsDvg()
+        return
+
+
+# dvg 对比单位
+class DvgUnit:
+    def __init__(self):
+        self.Idx = 0
+        self.Pv = 0.0
+        self.Mv = 0.0
+
+    def __init__(self, df, idx):
+        self.Idx = idx
+        self.Pv = df.loc[idx, 'close']
+        self.Mv = df.loc[idx, 'macd']
+
+
+class DvgSet:
+    def __init__(self):
+        self.LU = DvgUnit()
+        self.RU = DvgUnit()
+
+    def __init__(self, df, idxL, idxR):
+        self.LU = DvgUnit(df, idxL)
+        self.RU = DvgUnit(df, idxR)
+
+    def IsDvg(self):
+        if RU.Pv <= LU.Pv and Ru.Mv >= LU.Pv:
+            return True
+        return False

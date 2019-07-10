@@ -24,7 +24,7 @@ def F_MACD_TypeA_in(st, grades):
             # print(rst)
         except Exception as e:
             print("-------err %s %s %s" % (st, grade, e))
-
+# ----------------------------------------------------------------数据部分 end
 
 # 入口
 def F_MACD_TypeA(st, grade):
@@ -36,7 +36,6 @@ def F_MACD_TypeA(st, grade):
     if len(df) < 100:
         return -1
     # print(df[-10:])
-
 
     # 点A
     idxA = GetPointA(df)
@@ -188,7 +187,6 @@ def GetPointA(df):
     #     firstRedCnt += 1
     # if firstRedCnt > 15:
     #     return -1  #放弃找B
-
     return ia
 
 
