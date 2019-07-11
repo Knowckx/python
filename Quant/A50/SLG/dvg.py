@@ -1,15 +1,24 @@
 import pandas as pd
 
-import Quant.A50.csvdata as csvdata
-from c_dvg import *
+from .c_dvg import *
 
 '''
-Divergence   [daɪˈvɜːrdʒəns] 
+Divergence [daɪˈvɜːrdʒəns] 
 分歧 背离
 '''
+
+#experience args
+ExtmCheckLen = 20
+
+
 # -----------------Main Start-----------------
 def Start(df):
-    bokl5 = GetBlockL5(df)
+    print(df[-5:])
+    
+    # pre is lowest or highest
+    rst = IsExtmAndTurn(df.close)
+    return 
+    bokl5 = GetBlockL5(df) 
     idxNow = bokl5.ILe
     if idxNow == -1:
         return
@@ -25,6 +34,25 @@ def Start(df):
 
 # -----------------Main End-----------------
 
+# -----------------pre Start-----------------
+
+# price now is extremum and turn  va -1 lowest 1 hight 0 normal
+def IsExtmAndTurn(clList):
+    closeList = clList[-ExtmCheckLen:]
+    idxTar = closeList.index[-2]
+    idxlow = closeList.idxmin()
+    if idxlow == idxTar:
+        return -1
+    idxhigh = closeList.idxmax()
+    if idxhigh == idxTar:
+        return 1
+    return 0
+# -----------------P0 pre End-----------------
+
+
+
+# -----------------P1 Start-----------------
+
 def GetBlockL5():
     clList = df['close'][-21:]
     rst = IsLowestL5(clList)
@@ -32,6 +60,10 @@ def GetBlockL5():
         print(rst)
         return
     return Block(50,60)
+
+
+
+# -----------------P1 End-----------------
 
 
 
@@ -56,14 +88,6 @@ def IsPointSyncPM(MV):
         return false
     return true
 
-
-# P1 长21的close数组
-def IsLowestL5(clList):
-    low21 = clList.idxmin()
-    if low21 == -1:  # P1 OK
-        return ""
-    msg = "close[-1] is not lowest"
-    return msg
 
 
 # -----------------Func Start-----------------

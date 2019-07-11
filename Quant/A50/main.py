@@ -1,15 +1,28 @@
 
 import pandas as pd
 
+import Quant.A50.SLG.dvg  as  dvg
+import Quant.A50.data.csv as csv
 
-def GetPDdata():
-    df1d=pd.read_csv('Quant/A50/csv/399925_1d.csv',index_col=0)
-    return df1d
 
 # 入口
-def Start():
-    df1d = GetPDdata() # data prepare
-    print(df1d[-5:])
+def Test_IsExtmAndTurn():
+    df = csv.GetPDdata() # data prepare
+    # plist = df.close
+
+    for i in range(0,100):
+        # print(df[-3:])
+        tar = df.index[-1]
+        df.drop([tar],inplace = True)
+        
+        plist = df.close
+        rst = dvg.IsExtmAndTurn(plist)
+        if rst !=0 :
+            ti = df.loc[tar-1, 'time']
+            print("%s,%d"%(ti,rst))
+
+            
 
 
-Start()
+
+Test_IsExtmAndTurn()
