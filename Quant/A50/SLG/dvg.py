@@ -66,8 +66,6 @@ def IsLowestL5(clList):
     return msg
 
 
-
-
 # -----------------Func Start-----------------
 # func1
 def FindNextLeftBlock(macdList, start, minlen):

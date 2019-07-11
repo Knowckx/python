@@ -24,13 +24,11 @@
             "console": "externalTerminal"
         },
         {
-            "name": "Python: Terminal (external)",
+            "name": "A50 Debug",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "externalTerminal"
+            "program": "${workspaceFolder}/Quant/A50/main.Py",
         },
-
         {
             "name": "Python: Module",
             "type": "python",
