@@ -7,27 +7,32 @@ Divergence [daɪˈvɜːrdʒəns]
 分歧 背离
 '''
 
-#experience args
+# experience args
 ExtmCheckLen = 20
+RecnetBarsLen = 100
 
 
 # -----------------Main Start-----------------
 def Start(df):
     print(df[-5:])
-    
+
     # pre is lowest or highest
     rst = IsExtmAndTurn(df.close)
-    return 
-    bokl5 = GetBlockL5(df) 
-    idxNow = bokl5.ILe
-    if idxNow == -1:
+    if rst.Flag == 0:
+        print("IsExtmAndTurn return false,continue")
         return
-    mali = df.macd
-    limit = bokl5.Len()*0.75
-    bokl10 = FindNextLeftBlock(mali,idxNow,limit)
-    bokl10.Anal()
-
-    mSet = DvgSet(df,bokl10.IRep,bokl5.IRep)
+    # P1 dig Block L5
+    dfRecent = df[-RecnetBarsLen:]
+    bokl5 = GetBlockL5(dfRecent, rst)
+    # P2 dig Block L10
+    idxNow = bokl5.ILe
+    bokL10 = GetBlockL10(df, idxNow, rst.F_hl)
+    if bokL10.ILe == -1:
+        print("find bokL10 failed,continue")
+        return
+    
+    # P3 two Block Anal
+    mSet = DvgSet(df, bokl10.RepUn, bokl5.RepUn)
     rst = mSet.IsDvg()
     print(rst)
 
@@ -42,75 +47,86 @@ def IsExtmAndTurn(clList):
     idxTar = closeList.index[-2]
     idxlow = closeList.idxmin()
     if idxlow == idxTar:
-        return -1
+        return ExtmCheckRst(-1, idxlow)
     idxhigh = closeList.idxmax()
     if idxhigh == idxTar:
-        return 1
-    return 0
-# -----------------P0 pre End-----------------
-
-
+        return ExtmCheckRst(1, idxhigh)
+    return ExtmCheckRst(0, -1)
+# -----------------pre End-----------------
 
 # -----------------P1 Start-----------------
 
-def GetBlockL5():
-    clList = df['close'][-21:]
-    rst = IsLowestL5(clList)
-    if rst != "":
-        print(rst)
-        return
-    return Block(50,60)
 
-
+def GetBlockL5(df, extmRst):
+    bokl5 = DigBlock(df.macd, extmRst.Idx, extmRst.F_hl)
+    bokl5.Anal()
+    return bokl5
 
 # -----------------P1 End-----------------
 
+# -----------------P2 Start-----------------
+def GetBlockL10(df, idxNow, h_l):
+    BokL10 = Block()
+    while idxNow > 0:
+        tempBok = FindNextBlock(df,idxNow,h_l)
+        if tempBok.Len() <= minlen:
+            idxNow = tempBok.ILe-1
+            continue
+        BokL10 = tempBok
+    BokL10.Anal()
+    return BokL10
+        
+    # mali = df.macd
+    # bokl10.Anal()
 
+    # -----------------P2 End-----------------
 
-def AnalBlockL5(df):
-    mv = df.loc[-1, 'macd']
-    if mv > 0:  # MACD is red
-        pass
-        # return false #TyA
-    # MACD is green Synced
-    maList = df['macd'][-21:]
-    idxL = DigBlock(maList)
-    if idxL == -1:
-        return
-    dfL5 = df[idxL:]
-    blockL5 = Block(dfL5)
-    blockL5.Anal()
+    # -----------------Func Start-----------------
+    # func1
 
+def FindNextBlock(macdList, start):
+    iri = GetNextBlockStart()
+    tempBok = DigBlock(macdList, idxRt, h_l)
+    return tempBok
 
-# P2.1 值和M值是同步的
-def IsPointSyncPM(MV):
-    if MV > 0:  # MACD is red
-        return false
-    return true
-
-
-
-# -----------------Func Start-----------------
-# func1
-def FindNextLeftBlock(macdList, start, minlen):
+# return the 
+def GetNextBlockStart(macdList, start, h_l):
     i = start
-    iLe,iRi = -1,-1
+    iLe, iRi = -1, -1
     while i > 0:
         if macdList[i] >= 0:
             i -= 1
             continue
-        tempLe = GetLeftofBlock(macdList, i)
-        if (i+1-tempLe) >= minlen: # OK
-            iLe = tempLe  
+        tempLe = GetLeftofBlock1(macdList, i)
+        if (i+1-tempLe) >= minlen:  # OK
+            iLe = tempLe
             iRi = i+1
             break
         # invalid Block
         i = tempLe - 1
         continue
-    return Block(iLe,iRi)
+    return Block(iLe, iRi)
+
+
+# func1 given index_right,given ask [high,1,red or low,-1,green] to find the wholeblock
+# return the block with [left , right]
+def DigBlock(macdList, idxRt, h_l):
+    bokl5 = Block()
+    # check Block is point style
+    mv = macdList[idxRt]
+    if (isred and mv < 0) or ((not isred) and mv > 0):
+        bokl5.ILe = idxRt
+        bokl5.IRi = idxRt
+        bokl5.RepUn = DvgUnit(df, idxRt)
+        print("Broker is a point")
+        return bokl5
+
+    # common Block. get the left of block
+    ife = GetBlockLeft(macdList, idxRt, h_l)
+
 
 # func1.1 to get the left index of the whole block
-def GetLeftofBlock(macdList, right):
+def GetBlockLeft(macdList, right , h_l):
     i = right
     while i > 0:
         if macdList[i] < 0:
@@ -118,7 +134,7 @@ def GetLeftofBlock(macdList, right):
             continue
         # > 0
         return i+1
-    msg = "GetLeftofBlock Error:Index Out of the Array"
+    msg = "GetLeftofBlock1 Error:Index Out of the Array"
     print(msg)
     return -1
 
