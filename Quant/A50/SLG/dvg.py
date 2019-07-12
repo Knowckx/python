@@ -18,19 +18,20 @@ def Start(df):
 
     # pre is lowest or highest
     rst = IsExtmAndTurn(df.close)
-    if rst.Flag == 0:
+    if rst.F_hl == 0:
         print("IsExtmAndTurn return false,continue")
         return
     # P1 dig Block L5
     dfRecent = df[-RecnetBarsLen:]
     bokl5 = GetBlockL5(dfRecent, rst)
     # P2 dig Block L10
-    idxNow = bokl5.ILe
-    bokL10 = GetBlockL10(df, idxNow, rst.F_hl)
+    l10args = SearchBlockL10Args(bokl5.ILe-1, rst.F_hl, bokl5.Len())
+
+    bokL10 = GetBlockL10(df, l10args)
     if bokL10.ILe == -1:
         print("find bokL10 failed,continue")
         return
-    
+
     # P3 two Block Anal
     mSet = DvgSet(df, bokl10.RepUn, bokl5.RepUn)
     rst = mSet.IsDvg()
@@ -65,47 +66,48 @@ def GetBlockL5(df, extmRst):
 # -----------------P1 End-----------------
 
 # -----------------P2 Start-----------------
-def GetBlockL10(df, idxNow, h_l):
-    BokL10 = Block()
-    while idxNow > 0:
-        tempBok = FindNextBlock(df,idxNow,h_l)
-        if tempBok.Len() <= minlen:
+
+# 给出符合长度的block
+
+
+def GetBlockL10(df, args):
+    idxNow = args.IdxNow
+    maxTry = 3  # 参见2018-06出现的间杂点
+    while maxTry > 0:
+        tempBok = FindNextBlock(df.close, idxNow, args.F_hl)
+        if tempBok.Len() <= args.MinLen:
             idxNow = tempBok.ILe-1
+            maxTry -= 1
             continue
+        # success
         BokL10 = tempBok
-    BokL10.Anal()
-    return BokL10
-        
-    # mali = df.macd
-    # bokl10.Anal()
+        BokL10.Anal(df)
+        return BokL10
+    return Block()
 
     # -----------------P2 End-----------------
 
     # -----------------Func Start-----------------
     # func1
 
-def FindNextBlock(macdList, start):
-    iri = GetNextBlockStart()
+# 返回下一个block
+
+
+def FindNextBlock(macdList, start, f_hl):
+    iri = GetNextBlockStart(macdList, start, f_hl)
     tempBok = DigBlock(macdList, idxRt, h_l)
     return tempBok
 
-# return the 
-def GetNextBlockStart(macdList, start, h_l):
+# return the
+
+
+def GetNextBlockStart(macdList, start, f_hl):
     i = start
-    iLe, iRi = -1, -1
     while i > 0:
-        if macdList[i] >= 0:
+        if (macdList[i] >0 and f_hl == 1) or (macdList[i] < 0 and f_hl == -1)
+        
             i -= 1
             continue
-        tempLe = GetLeftofBlock1(macdList, i)
-        if (i+1-tempLe) >= minlen:  # OK
-            iLe = tempLe
-            iRi = i+1
-            break
-        # invalid Block
-        i = tempLe - 1
-        continue
-    return Block(iLe, iRi)
 
 
 # func1 given index_right,given ask [high,1,red or low,-1,green] to find the wholeblock
@@ -126,7 +128,7 @@ def DigBlock(macdList, idxRt, h_l):
 
 
 # func1.1 to get the left index of the whole block
-def GetBlockLeft(macdList, right , h_l):
+def GetBlockLeft(macdList, right, h_l):
     i = right
     while i > 0:
         if macdList[i] < 0:

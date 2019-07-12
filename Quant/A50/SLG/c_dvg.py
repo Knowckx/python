@@ -66,6 +66,7 @@ class DvgUnit:
         self.Mv = df.loc[idx, 'macd']
 
 
+# ----------------- struct -----------------
 class ExtmCheckRst:
     def __init__(self):
         self.F_hl = 0
@@ -74,3 +75,11 @@ class ExtmCheckRst:
     def __init__(self, checkRst, idx):
         self.F_hl = checkRst
         self.Idx = idx
+
+
+class SearchBlockL10Args:
+    def __init__(self,idxNow,f_hl,minlen):
+        self.IdxNow = idxNow # from where
+        self.F_hl = f_hl # search for red or green
+        self.MinLen = minlen # min broker Len
+
