@@ -31,10 +31,10 @@ def get_commetList(weiboID,mode=111):
     if ResL!= None:
         idList.extend(ResL)
 
-    # zan_url = 'http://m.weibo.cn/api/attitudes/show'
-    # ResL = getIDList_Att(zan_url,weiboID)
-    # if ResL!= None:
-    #     idList.extend(ResL)
+    zan_url = 'http://m.weibo.cn/api/attitudes/show'
+    ResL = getIDList_Att(zan_url,weiboID)
+    if ResL!= None:
+        idList.extend(ResL)
 
     print("相加总数：%s"%len(idList))
     idList = list(set(idList))
@@ -238,8 +238,8 @@ if __name__ == '__main__':
     if testStr == 'get_comment':  
         lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'HkLbXiqQK'
-        midCnt = 0
+        weiboID = 'HtKrsowvR'
+        midCnt = 130
         main(weiboID,midCnt)
 
 
