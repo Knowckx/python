@@ -86,22 +86,9 @@ def GetBlockL10(df, args):
         return BokL10
     return Block()
 
-    # -----------------P2 End-----------------
+# -----------------P2 End-----------------
 
-    # -----------------Func Start-----------------
-    # func1
-
-# 返回下一个block
-
-
-# def FindNextBlock(df, start, f_hl):
-#     iri = GetNextBlockStart(df.macd, start, f_hl)
-#     tempBok = DigBlock(df, iri, f_hl)
-#     return tempBok
-
-# return the
-
-
+# -----------------Func Start-----------------
 def GetNextBlockStart(macdList, start, f_hl):
     i = start
     while i > 0:
@@ -159,7 +146,7 @@ def FinalLog(bokL5,bokL10):
         mod = "1.1"
 
     if bokL10.ILe != -1:
-        mSet = DvgSet()
+        mSet = DvgSignal()
         mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, bokL5.F_hl)
         rst = mSet.IsDvg()
         if rst:

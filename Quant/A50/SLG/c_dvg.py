@@ -1,3 +1,16 @@
+
+
+class DvgSet:
+    def __init__(self,df):  # given a invaild block
+        self.DF = df # target df datas
+        # F_hl
+        self.BlockL5 = Block() # P1
+        self.BlockL10 = Block() # P2
+        self.DvgSignal = DvgSignal() #P3
+        
+
+
+
 #　obj represent macd Block
 class Block:
     def __init__(self): # given a invaild block
@@ -34,11 +47,11 @@ class Block:
             
         # Try TyB  价格极值总是在右边
         # print("try check TyB:%s %s"%(DFTime(df,idxM), DFTime(df,idxP)))
-        dvgSet = DvgSet()
-        dvgSet.InitPoint2(df, idxM, idxP,self.F_hl)
-        if dvgSet.IsDvg():
+        dvgSignal = DvgSignal()
+        dvgSignal.InitPoint2(df, idxM, idxP,self.F_hl)
+        if dvgSignal.IsDvg():
             self.TyB = True
-            self.TyB_Set = dvgSet
+            self.TyB_Set = dvgSignal
         return
 
     def Len(self):
@@ -50,13 +63,13 @@ class Block:
     
 
 # 判断背离
-class DvgSet:
+class DvgSignal:
     def __init__(self):
         self.LU = DvgUnit()
         self.RU = DvgUnit()
         self.F_hl = 0
 
-    #two point
+    # two point
     def InitPoint2(self, df, idxL, idxR,f_hl):
         self.LU.Init(df, idxL)
         self.RU.Init(df, idxR)
@@ -78,7 +91,7 @@ class DvgSet:
         return False
 
     def Print(self):
-        print("DvgSet:[%s %s]"%(self.LU.Time, self.RU.Time))
+        print("DvgSignal:[%s %s]"%(self.LU.Time, self.RU.Time))
 
 class DvgUnit:
     def __init__(self):
