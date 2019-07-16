@@ -11,6 +11,12 @@
             "program": "${file}"
         },
         {
+            "name": "A50 Debug",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/Quant/A50/main.Py",
+        },
+        {
             "name": "FutuStart",
             "type": "python",
             "request": "launch",
@@ -24,17 +30,10 @@
             "console": "externalTerminal"
         },
         {
-            "name": "A50 Debug",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/Quant/A50/main.Py",
-        },
-        {
             "name": "Python: Module",
             "type": "python",
             "request": "launch",
             "module": "module.name"
         },
-
     ]
 }
