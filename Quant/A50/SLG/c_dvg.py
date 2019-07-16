@@ -1,7 +1,7 @@
 
 # experience args
 RecnetBarsLen = 100
-
+ExtmCheckLen = 20
 
 class DvgSet:
     def __init__(self, df, f_hl):  # given a invaild block
@@ -32,10 +32,11 @@ class DvgSet:
     # return the block with DF[left , right]
     def DigBlockWithPoint(self, df):
         tempbok = Block()
-        idxTar = df.close.idxmax()
+        clList = df.close[-ExtmCheckLen:]
+        idxTar = clList.idxmax()
         h_l = self.F_hl
         if h_l == -1:
-            idxTar = df.close.idxmin()
+            idxTar = clList.idxmin()
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
@@ -57,7 +58,6 @@ class DvgSet:
         i = lastI
         while i > 0:
             if (f_hl == 1 and macdList[i] > 0) or (f_hl == -1 and macdList[i] < 0):
-                print(DFTime(self.DF,i))
                 return i
             i -= 1
 
@@ -117,7 +117,8 @@ class DvgSet:
             bokL5.TyB_Set.Print()
             mod = mod + "1.1"
         else:
-            mod = mod + "1.0"
+            if mod != "":
+                mod = mod + "1.0"
 
         if mod == "":
             print("<--- None Out")
