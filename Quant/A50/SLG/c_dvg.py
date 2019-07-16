@@ -25,7 +25,7 @@ class DvgSet:
     # P1 dig Block L5
     def GetBlockL5(self):
         dfRecent = self.DF[-RecnetBarsLen:]
-        self.BlockL5 = DigBlockWithPoint(dfRecent)
+        self.BlockL5 = self.DigBlockWithPoint(dfRecent)
         self.BlockL5.Anal(self.F_hl)
 
     # func1 given index_right,given ask [high,1,red or low,-1,green] to find the wholeblock
@@ -77,7 +77,7 @@ class DvgSet:
     # 给出符合长度的block
     def GetBlockL10(self):
         idxNow = self.BlockL5.ILe-1
-        df = self.DF.loc[:NewStart]
+        df = self.DF.loc[:idxNow]
         tempbok = Block()
         maxTry = 3  # 参见2018-06出现的间杂点
         maxBars = 40  # 向前寻找最多2个月*20天
@@ -91,7 +91,7 @@ class DvgSet:
             if tempLen >= 0.8*self.BlockL5.Len():
                 # success
                 tempbok.Init(tempLe, tempRi, df)
-                tempbok.Anal()
+                tempbok.Anal(self.F_hl)
                 return tempbok
             maxTry -= 1
             maxBars -= tempLen
@@ -168,7 +168,7 @@ class Block:
         # Try TyB  价格极值总是在右边
         # print("try check TyB:%s %s"%(DFTime(df,idxM), DFTime(df,idxP)))
         dvgSignal = DvgSignal()
-        dvgSignal.InitPoint2(df, idxM, idxP, self.F_hl)
+        dvgSignal.InitPoint2(df, idxM, idxP, f_hl)
         if dvgSignal.IsDvg():
             self.TyB = True
             self.TyB_Set = dvgSignal

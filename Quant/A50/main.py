@@ -14,7 +14,6 @@ def test():
         dftest = df[:i-301]
         dvg.Start(dftest)
 
-
 def AssignDF(df, date):
     while True:
         # print(df[-1:])
