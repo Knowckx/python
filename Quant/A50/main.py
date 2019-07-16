@@ -4,14 +4,14 @@ import Quant.A50.SLG.dvg as dvg
 
 def test():
     df = csv.GetPDdata()  # data prepare
-    # df = AssignDF(df,"2017-07-25")
+    # df = AssignDF(df,"2018-05-14")
     # print(df[-3:])
-
+    fix = 17
     for i in range(0, 300):
-        # print(df[-3:])
+        print(i)
         # tar = df.index[-1]
         # df.drop([tar],inplace = True)
-        dftest = df[:i-301]
+        dftest = df[:i-301 + fix]
         dvg.Start(dftest)
 
 def AssignDF(df, date):

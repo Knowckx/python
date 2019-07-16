@@ -39,7 +39,7 @@ class DvgSet:
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
-            print("block is a point")
+            print("not sync. block is a point")
             return tempbok
         return self.DigCommonBlock(df)
 
@@ -57,6 +57,7 @@ class DvgSet:
         i = lastI
         while i > 0:
             if (f_hl == 1 and macdList[i] > 0) or (f_hl == -1 and macdList[i] < 0):
+                print(DFTime(self.DF,i))
                 return i
             i -= 1
 
@@ -78,7 +79,6 @@ class DvgSet:
     def GetBlockL10(self):
         idxNow = self.BlockL5.ILe-1
         df = self.DF.loc[:idxNow]
-        tempbok = Block()
         maxTry = 3  # 参见2018-06出现的间杂点
         maxBars = 40  # 向前寻找最多2个月*20天
         while maxTry > 0 and maxBars > 0:
@@ -90,20 +90,20 @@ class DvgSet:
             tempLen = tempRi-tempLe+1
             if tempLen >= 0.8*self.BlockL5.Len():
                 # success
-                tempbok.Init(tempLe, tempRi, df)
-                tempbok.Anal(self.F_hl)
-                return tempbok
+                self.BlockL10.Init(tempLe, tempRi, df)
+                self.BlockL10.Anal(self.F_hl)
+                return 
             maxTry -= 1
             maxBars -= tempLen
             idxNow = tempLe - 1
-        return tempbok
+        return 
 
     def FinalLog(self):
         bokL5 = self.BlockL5
         bokL10 = self.BlockL10
 
         mod = ""
-        if not bokL10.IsInValid:
+        if not bokL10.IsInValid():
             mSet = DvgSignal()
             mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
             rst = mSet.IsDvg()
@@ -122,8 +122,7 @@ class DvgSet:
         if mod == "":
             print("<--- None Out")
         else:
-            print("Anal result:")
-            print(mod)
+            print("Anal result:%s"%mod)
             print("<--- Success")
         return
 
@@ -153,8 +152,10 @@ class Block:
         df = self.DF
         if f_hl == 0:
             return
-        # print(df)
-        # self.Print()
+
+        self.TLe = self.DF.loc[self.ILe,"time"]
+        self.TRi = self.DF.loc[self.IRi,"time"]
+
         idxP = df.close.idxmin()  # f_hl = -1
         idxM = df.macd.idxmin()
         if f_hl == 1:
