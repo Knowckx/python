@@ -213,7 +213,7 @@ class DvgSignal:
         return False
 
     def Print(self):
-        print("DvgSignal:[%s %s]" % (self.LU.Time, self.RU.Time))
+        print("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
 
 
 class DvgUnit:
