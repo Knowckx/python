@@ -14,7 +14,7 @@ class DvgSet:
     # P1 P2
     def Go(self):
         self.GetBlockL5()
-        if self.BlockL5.IsInValid():
+        if self.BlockL5.IsValid() == False:
             return -1
 
         self.GetBlockL10()  # only L5 is TypeB is Possible
@@ -80,30 +80,46 @@ class DvgSet:
         idxNow = self.BlockL5.ILe-1
         df = self.DF.loc[:idxNow]
         maxTry = 3  # 参见2018-06出现的间杂点
-        maxBars = 40  # 向前寻找最多2个月*20天
-        while maxTry > 0 and maxBars > 0:
+        maxSearchBars = 40  # 向前寻找最多2个月*20天
+        while maxTry > 0 and maxSearchBars > 0:
             tempRi = self.GetNextBlockRight(df.macd, idxNow)  # 1
-            maxBars -= (idxNow - tempRi)
-            if maxBars < 0:
+            maxSearchBars -= (idxNow - tempRi)
+            if maxSearchBars < 0:
                 break
-            tempLe = self.GetBlockLeft(df.macd, tempRi)
+            tempLe = self.GetBlockLeft(df.macd, tempRi) # 目标块的左右都已拿到
             tempLen = tempRi-tempLe+1
-            if tempLen >= 0.8*self.BlockL5.Len():
+            if tempLen >= 0.8*self.BlockL5.Len(): # 长度要合格
                 # success
                 self.BlockL10.Init(tempLe, tempRi, df)
                 self.BlockL10.Anal(self.F_hl)
                 return 
             maxTry -= 1
-            maxBars -= tempLen
+            maxSearchBars -= tempLen
             idxNow = tempLe - 1
         return 
+
+    # L10是否有效
+    def IsBokL10Valid(self):
+        bokL5 = self.BlockL5
+        bokL10 = self.BlockL10
+        if not bokL10.IsValid():
+            return False
+        f_hl = self.F_hl
+        if f_hl == 1:  # red
+            if bokL10.Mv <= bokL5.Mv:
+                return False
+        if f_hl == -1:
+            if bokL10.Mv >= bokL5.Mv:
+                return False
+        return True
 
     def FinalLog(self):
         bokL5 = self.BlockL5
         bokL10 = self.BlockL10
 
         mod = ""
-        if not bokL10.IsInValid():
+        if self.IsBokL10Valid(): # 是否是标准的双块背离呢
+            # if bokL10.Mv 
             mSet = DvgSignal()
             mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
             rst = mSet.IsDvg()
@@ -137,8 +153,8 @@ class Block:
         self.TyB = False  # Dvg.TyB in the Block
         self.RepUn = DvgUnit()  # the DvgUnit of this Block
 
-    def IsInValid(self):
-        if self.ILe == -1 or self.IRi == -1:
+    def IsValid(self):
+        if self.ILe != -1 and self.IRi != -1:
             return True
         return False
 
@@ -162,12 +178,14 @@ class Block:
         if f_hl == 1:
             idxP = df.close.idxmax()
             idxM = df.macd.idxmax()
+
+        self.Mv = self.DF.loc[idxM,"macd"] # 保存一下本块的MACD极值
         self.RepUn.Init(df, idxP)  # 总是由极值代表
         if idxP == idxM:
             # print("Block Desc:Single extm")
             return
 
-        # Try TyB  价格极值总是在右边
+        # Try TyB  
         # print("try check TyB:%s %s"%(DFTime(df,idxM), DFTime(df,idxP)))
         dvgSignal = DvgSignal()
         dvgSignal.InitPoint2(df, idxM, idxP, f_hl)
@@ -193,6 +211,8 @@ class DvgSignal:
 
     # two point
     def InitPoint2(self, df, idxL, idxR, f_hl):
+        if idxL > idxR: # 价值极值总在右边
+            return
         self.LU.Init(df, idxL)
         self.RU.Init(df, idxR)
         self.F_hl = f_hl
@@ -216,6 +236,7 @@ class DvgSignal:
         print("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
 
 
+# 该块用于比较的那个点位
 class DvgUnit:
     def __init__(self):
         self.Idx = -1

@@ -6,7 +6,7 @@ import sys
 def test():
 
     df = csv.GetPDdata()  # data prepare
-    # TestInOneDay(df,"2019-07-19")
+    # TestInOneDay(df,"2019-05-24")
 
     # fix = 17
     for i in range(0, 300):
