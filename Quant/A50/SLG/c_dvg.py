@@ -139,7 +139,7 @@ class DvgSet:
         if mod == "":
             print("<--- None Out")
         else:
-            print("Anal result:%s"%mod)
+            print("Anal result:%s flag:%d"%(mod,self.F_hl))
             print("<--- Success")
         return
 
