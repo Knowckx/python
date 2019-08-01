@@ -13,7 +13,7 @@ def Start(df):
     rst = IsExtmAndTurn(df.close)
     if rst.F_hl == 0:
         # print("IsExtmAndTurn false,continue")
-        return -1
+        return 0
     print("IsExtmAndTurn In -->", df.loc[df.index[-1], 'time'])
     dvg = DvgSet(df,rst.F_hl)
     dvgrst = dvg.Go()
