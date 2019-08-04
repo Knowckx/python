@@ -14,10 +14,10 @@ def Start(df):
     if rst.F_hl == 0:
         # print("IsExtmAndTurn false,continue")
         return 0
-    print("IsExtmAndTurn In -->", df.loc[df.index[-1], 'time'])
+    # print("IsExtmAndTurn In -->", df.loc[df.index[-1], 'time'])
     dvg = DvgSet(df,rst.F_hl)
     dvgrst = dvg.Go()
-    print(dvgrst)
+    # print(dvgrst)
     return dvgrst
 
 # price now is extremum and turn  va -1 lowest 1 hight 0 normal
@@ -76,7 +76,7 @@ class DvgSet:
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
-            print("not sync. block is a point")
+            # print("not sync. block is a point")
             return tempbok
         return self.DigCommonBlock(df)
 
@@ -153,31 +153,29 @@ class DvgSet:
         bokL5 = self.BlockL5
         bokL10 = self.BlockL10
 
-        mod = ""
+        modL,modR = "",""
+        mSet = DvgSignal()
+        # mSet.Print()
+
         if self.IsBokL10Valid(): # 是否是标准的双块背离呢
-            # if bokL10.Mv 
-            mSet = DvgSignal()
             mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
             rst = mSet.IsDvg()
             if rst:
                 # print("find Block Dvg")
-                mSet.Print()
-                mod = "2.0 -- "
+                modL = "2.0"
+                modR = "1.0"
 
-        if bokL5.TyB:
-            # print("find L5 TypeB Dvg")
-            bokL5.TyB_Set.Print()
-            mod = mod + "1.1"
-        else:
-            if mod != "":
-                mod = mod + "1.0"
+        if bokL5.SetTyB.OK:
+            modR = "1.1"
 
-        if mod == "":
-            print("<--- None Out")
+        if modR == "":
+            # print("<--- None Out")
             return 0
-        
-        print("Anal result:%s flag:%d"%(mod,self.F_hl))
-        print("<--- Success")
+        print("---> New DVG  time:%s "%(self.DF.time.iat[-1]))
+        print("flag:{} || mode:{} -- {}".format(self.F_hl,modL,modR))
+        mSet.Print()
+        bokL5.SetTyB.Print()
+        print("\n")
         return self.F_hl
 
 
@@ -187,7 +185,7 @@ class Block:
         self.ILe = -1  # base info
         self.IRi = -1
 
-        self.TyB = False  # Dvg.TyB in the Block
+        self.SetTyB = DvgSignal()  # TyB in the Block
         self.RepUn = DvgUnit()  # the DvgUnit of this Block
 
     def IsValid(self):
@@ -223,12 +221,8 @@ class Block:
             return
 
         # Try TyB  
-        # print("try check TyB:%s %s"%(DFTime(df,idxM), DFTime(df,idxP)))
-        dvgSignal = DvgSignal()
-        dvgSignal.InitPoint2(df, idxM, idxP, f_hl)
-        if dvgSignal.IsDvg():
-            self.TyB = True
-            self.TyB_Set = dvgSignal
+        self.SetTyB.InitPoint2(df, idxM, idxP, f_hl)
+        self.SetTyB.IsDvg()
         return
 
     def Len(self):
@@ -245,6 +239,7 @@ class DvgSignal:
         self.LU = DvgUnit()
         self.RU = DvgUnit()
         self.F_hl = 0
+        self.OK = False
 
     # two point
     def InitPoint2(self, df, idxL, idxR, f_hl):
@@ -263,14 +258,15 @@ class DvgSignal:
         f_hl = self.F_hl
         if f_hl == 1:  # red
             if self.RU.Pv >= self.LU.Pv and self.RU.Mv <= self.LU.Mv:
-                return True
+                self.OK = True
         if f_hl == -1:
             if self.RU.Pv <= self.LU.Pv and self.RU.Mv >= self.LU.Mv:
-                return True
-        return False
+                self.OK = True
+        return self.OK
 
     def Print(self):
-        print("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
+        if self.OK:
+            print("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
 
 
 # 该块用于比较的那个点位

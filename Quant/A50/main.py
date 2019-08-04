@@ -4,15 +4,18 @@ import sys
 
 
 def test():
+    tarFile = '601318_5m'
+    df = csv.GetPDdata(tarFile)  # data prepare
 
-    df = csv.GetPDdata()  # data prepare
+    # print(df[-1:])  # test DF
+
     # TestInOneDay(df,"2019-05-24")
 
     # fix = 17
-    for i in range(0, 300):
+    for i in range(0, 600):
         # tar = df.index[-1]
         # df.drop([tar],inplace = True)
-        dftest = df[:i-301]
+        dftest = df[:i-601]
         dvg.Start(dftest)
 
 def TestInOneDay(df, date):

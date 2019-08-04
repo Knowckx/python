@@ -238,8 +238,8 @@ if __name__ == '__main__':
     if testStr == 'get_comment':  
         lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'HtKrsowvR'
-        midCnt = 130
+        weiboID = 'I0phg43lg'
+        midCnt = 0
         main(weiboID,midCnt)
 
 
