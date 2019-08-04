@@ -14,7 +14,8 @@ def Start(df):
     if rst.F_hl == 0:
         # print("IsExtmAndTurn false,continue")
         return 0
-    # print("IsExtmAndTurn In -->", df.loc[df.index[-1], 'time'])
+    
+    # 此时[-2]位置一定是极值！
     dvg = DvgSet(df,rst.F_hl)
     dvgrst = dvg.Go()
     # print(dvgrst)
@@ -23,13 +24,14 @@ def Start(df):
 # price now is extremum and turn  va -1 lowest 1 hight 0 normal
 def IsExtmAndTurn(clList):
     closeList = clList[-ExtmCheckLen:]
-    idxTar = closeList.index[-2]
-    idxlow = closeList.idxmin()
-    if idxlow == idxTar:
-        return ExtmCheckRst(-1, idxlow)
-    idxhigh = closeList.idxmax()
-    if idxhigh == idxTar:
-        return ExtmCheckRst(1, idxhigh)
+    taridx = closeList.index[-2]
+    tarP = closeList.iat[-2]
+    minP = closeList.min()
+    if tarP <= minP*(1 + DvgExtmFixPara): # low
+        return ExtmCheckRst(-1, taridx)
+    maxP = closeList.max()
+    if tarP >= maxP*(1 - DvgExtmFixPara):
+        return ExtmCheckRst(1, taridx)
     return ExtmCheckRst(0, -1)
 
 
@@ -39,6 +41,8 @@ def IsExtmAndTurn(clList):
 # experience args
 RecnetBarsLen = 100
 ExtmCheckLen = 20 # #20天差不多了，上涨中的回调产生的背离大概间隔20天
+
+DvgExtmFixPara = 0.0015 # 不需要你是新极值，只要能处于前极限的这个范围里就进入检测。
 
 class DvgSet:
     def __init__(self, df, f_hl):  # given a invaild block
@@ -50,10 +54,9 @@ class DvgSet:
 
     # P1 P2
     def Go(self):
-        self.GetBlockL5()
-        if self.BlockL5.IsValid() == False:
+        rstL5 = self.GetBlockL5()
+        if rstL5 == False:
             return 0
-
         self.GetBlockL10()  # only L5 is TypeB is Possible
 
         return self.FinalLog()
@@ -61,23 +64,32 @@ class DvgSet:
     # P1 dig Block L5
     def GetBlockL5(self):
         dfRecent = self.DF[-RecnetBarsLen:]
-        self.BlockL5 = self.DigBlockWithPoint(dfRecent)
-        self.BlockL5.Anal(self.F_hl)
+        bok = self.DigBlockWithPoint(dfRecent)
+        if bok.IsValid() == False:
+            return False
+        bok.Anal(self.F_hl)
+        self.BlockL5 = bok
 
     # func1 given index_right,given ask [high,1,red or low,-1,green] to find the wholeblock
     # return the block with DF[left , right]
     def DigBlockWithPoint(self, df):
         tempbok = Block()
-        clList = df.close[-ExtmCheckLen:]
-        idxTar = clList.idxmax()
+        clList = df.close[-ExtmCheckLen:] 
         h_l = self.F_hl
-        if h_l == -1:
-            idxTar = clList.idxmin()
+        idxTar = clList.index[-2] #默认[-2]位置是极值。因为前面已经有检查
+
+        # 剔除反向段。下跌时。
+        if h_l == -1: 
+            if df.macd.at[idxTar-1] < df.macd.at[idxTar]: #背离点的M值必须更小
+                return tempbok
+
+        # 先检查一下，是否是 单点背离 - 反色 的形态
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
             # print("not sync. block is a point")
             return tempbok
+
         return self.DigCommonBlock(df)
 
     def DigCommonBlock(self, df):
@@ -205,10 +217,10 @@ class Block:
         if f_hl == 0:
             return
 
-        self.TLe = self.DF.loc[self.ILe,"time"]
-        self.TRi = self.DF.loc[self.IRi,"time"]
+        self.TLe = df.loc[self.ILe,"time"]
+        self.TRi = df.loc[self.IRi,"time"]
 
-        idxP = df.close.idxmin()  # f_hl = -1
+        idxP = df.close.idxmin()  # if f_hl = -1
         idxM = df.macd.idxmin()
         if f_hl == 1:
             idxP = df.close.idxmax()
@@ -257,10 +269,10 @@ class DvgSignal:
     def IsDvg(self):
         f_hl = self.F_hl
         if f_hl == 1:  # red
-            if self.RU.Pv >= self.LU.Pv and self.RU.Mv <= self.LU.Mv:
+            if self.RU.Pv >= self.LU.Pv*(1 - DvgExtmFixPara) and self.RU.Mv <= self.LU.Mv:
                 self.OK = True
         if f_hl == -1:
-            if self.RU.Pv <= self.LU.Pv and self.RU.Mv >= self.LU.Mv:
+            if self.RU.Pv <= self.LU.Pv*(1 + DvgExtmFixPara) and self.RU.Mv >= self.LU.Mv:
                 self.OK = True
         return self.OK
 

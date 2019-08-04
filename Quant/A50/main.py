@@ -4,38 +4,29 @@ import sys
 
 
 def test():
-    tarFile = '601318_5m'
+    tarFile = '000925.XSHG_1d'
     df = csv.GetPDdata(tarFile)  # data prepare
 
     # print(df[-1:])  # test DF
 
-    # TestInOneDay(df,"2019-05-24")
-
-    # fix = 17
-    for i in range(0, 600):
-        # tar = df.index[-1]
-        # df.drop([tar],inplace = True)
-        dftest = df[:i-601]
+    startData = "2013-12-27"
+    idx = GetDateIndex(df,startData)
+    while idx < df.index[-1]:
+        dftest = df.loc[idx-200:idx]
+        # print(dftest[-3:])
         dvg.Start(dftest)
-
-def TestInOneDay(df, date):
-    df = AssignDF(df,date)
-    print(df[-1:])
-    dvg.Start(df)
-    sys.exit(0)
+        idx +=1
 
 
 
-def AssignDF(df, date):
-    while True:
-        # print(df[-1:])
-        tar = df.index[-1]
-        newT = df.loc[tar, "time"]
-        if newT != date:
-            df.drop([tar], inplace=True)
-            continue
-        break
-    return df
+def GetDateIndex(df, date):
+    timeL = df.time
+    i = df.index[-1] #最后一个索引
+    while i > 0: 
+        if timeL.at[i] == date:
+            return i
+        i -= 1
+    return 0
 
 
 test()
