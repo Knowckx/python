@@ -21,9 +21,10 @@ def test():
 
 def GetDateIndex(df, date):
     timeL = df.time
+    date = datetime.datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
     i = df.index[-1] #最后一个索引
     while i > 0: 
-        if timeL.at[i] == date:
+        if timeL.at[i] <= date:
             return i
         i -= 1
     return 0

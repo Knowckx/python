@@ -122,7 +122,7 @@ def get_userInfo(userID):
     index1 = dataStr.find('<div')
     if(index1 == -1):
         print("怀疑该微博用户ID为空号")
-        return   
+        return 0
     index2 = dataStr.rfind('/div>')
     dataStr1 = dataStr[index1:index2+5]  #sub
     dataStr1 = dataStr1.replace('\\','') 
@@ -154,6 +154,9 @@ def get_userInfo(userID):
 #---------判断一个用户是不是目标
 def F_UserID(userID):
     infoDic = get_userInfo(userID)
+    if infoDic == 0:
+        print("------------目标获取失败------------")
+        return False
     # if infoDic.get('gender') != "女": #后面一定是正确性别
     #     print("非目标性别,PASS")
     #     return False      
@@ -225,22 +228,21 @@ headers_mweibo = {
 cookDomain = '.weibo.cn' #移动端的cook用的cn结尾   所以用这个工具，先得进一下网页得到cookies
 s = Utils_Web.GetSession(headers_mweibo,cookDomain) #这里有两个……header
 
-
+# 结果link weibo.com/u/3268974987
 
 #------------------------------
-
+tarWeiboID = 'I0S7Gwzkr'
 if __name__ == '__main__':
     testStr= 'main'  #入口
     if testStr == 'get_userInfo':
-        userID = '2853972281'
+        userID = '3145928704'
         info = get_userInfo(userID)
         print(info)
     if testStr == 'get_comment':  
         lista = get_commetList('Gr6XlunCl')
     if testStr == 'main':
-        weiboID = 'I0phg43lg'
         midCnt = 0
-        main(weiboID,midCnt)
+        main(tarWeiboID,midCnt)
 
 
 
