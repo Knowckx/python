@@ -8,7 +8,10 @@ Divergence [daɪˈvɜːrdʒəns]
 '''
 
 # -----------------Main Start-----------------
-def Start(df):
+
+# 入口
+def Start(df,grade = "1d"):
+    SetGradeFixPara(grade)
     # pre is lowest or highest
     rst = IsExtmAndTurn(df.close)
     if rst.F_hl == 0:
@@ -20,6 +23,19 @@ def Start(df):
     dvgrst = dvg.Go()
     # print(dvgrst)
     return dvgrst
+
+# DVG判断修正参数,防止接近新高但是未到，却背离的情况
+DvgExtmFixPara = 0.0015 
+def SetGradeFixPara(grade):
+    default = DvgExtmFixPara
+    if grade == "1d":
+        DvgExtmFixPara = default
+    if grade == "60m":
+        DvgExtmFixPara = default/4
+    if grade == "15m":
+        DvgExtmFixPara = default/4/4
+    if grade == "5m":
+        DvgExtmFixPara = default/4/4/3
 
 # price now is extremum and turn  va -1 lowest 1 hight 0 normal
 def IsExtmAndTurn(clList):
@@ -42,7 +58,7 @@ def IsExtmAndTurn(clList):
 RecnetBarsLen = 100
 ExtmCheckLen = 20 # #20天差不多了，上涨中的回调产生的背离大概间隔20天
 
-DvgExtmFixPara = 0.0015 # 不需要你是新极值，只要能处于前极限的这个范围里就进入检测。
+
 
 class DvgSet:
     def __init__(self, df, f_hl):  # given a invaild block
