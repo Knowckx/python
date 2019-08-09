@@ -1,11 +1,22 @@
 import pandas as pd
-
+import logging
 # from .c_dvg import *
 
 '''
 Divergence [daɪˈvɜːrdʒəns] 
 分歧 背离
 '''
+
+# logger
+def GetLogHandle():
+    logger = logging.getLogger("de")
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    logger.addHandler(handler)
+    return logger
+
+logger = GetLogHandle()
+
 
 # -----------------Main Start-----------------
 
@@ -15,18 +26,19 @@ def Start(df,grade = "1d"):
     # pre is lowest or highest
     rst = IsExtmAndTurn(df.close)
     if rst.F_hl == 0:
-        # print("IsExtmAndTurn false,continue")
+        # logger.info("IsExtmAndTurn false,continue")
         return 0
     
     # 此时[-2]位置一定是极值！
     dvg = DvgSet(df,rst.F_hl)
     dvgrst = dvg.Go()
-    # print(dvgrst)
+    # logger.info(dvgrst)
     return dvgrst
 
 # DVG判断修正参数,防止接近新高但是未到，却背离的情况
 DvgExtmFixPara = 0.0015 
 def SetGradeFixPara(grade):
+    global DvgExtmFixPara
     default = DvgExtmFixPara
     if grade == "1d":
         DvgExtmFixPara = default
@@ -103,7 +115,7 @@ class DvgSet:
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
-            # print("not sync. block is a point")
+            # logger.info("not sync. block is a point")
             return tempbok
 
         return self.DigCommonBlock(df)
@@ -136,7 +148,7 @@ class DvgSet:
             # > 0
             return i+1
         msg = "GetLeftofBlock1 Error:Index Out of the Array"
-        print(msg)
+        logger.info(msg)
         return -1
 
     # 给出符合长度的block
@@ -189,7 +201,7 @@ class DvgSet:
             mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
             rst = mSet.IsDvg()
             if rst:
-                # print("find Block Dvg")
+                # logger.info("find Block Dvg")
                 modL = "2.0"
                 modR = "1.0"
 
@@ -197,13 +209,13 @@ class DvgSet:
             modR = "1.1"
 
         if modR == "":
-            # print("<--- None Out")
+            # logger.info("<--- None Out")
             return 0
-        print("---> New DVG  time:%s "%(self.DF.time.iat[-1]))
-        print("flag:{} || mode:{} -- {}".format(self.F_hl,modL,modR))
+        logger.info("---> New DVG  time:%s "%(self.DF.time.iat[-1]))
+        logger.info("flag:{} || mode:{} -- {}".format(self.F_hl,modL,modR))
         mSet.Print()
         bokL5.SetTyB.Print()
-        print("\n")
+        logger.info("\n")
         return self.F_hl
 
 
@@ -225,7 +237,7 @@ class Block:
         self.ILe = ile
         self.IRi = iri
         self.DF = df.loc[ile:iri]
-        # print(newDF)
+        # logger.info(newDF)
 
     # Known [ILe,IRr] Anal and filled Values
     def Anal(self, f_hl):
@@ -245,7 +257,7 @@ class Block:
         self.Mv = self.DF.loc[idxM,"macd"] # 保存一下本块的MACD极值
         self.RepUn.Init(df, idxP)  # 总是由极值代表
         if idxP == idxM:
-            # print("Block Desc:Single extm")
+            # logger.info("Block Desc:Single extm")
             return
 
         # Try TyB  
@@ -258,7 +270,7 @@ class Block:
 
     def Print(self):
         df = self.DF
-        print("Block [%s,%s]" % (DFTime(df, self.ILe), DFTime(df, self.IRi)))
+        logger.info("Block [%s,%s]" % (DFTime(df, self.ILe), DFTime(df, self.IRi)))
 
 
 # 判断背离
@@ -294,7 +306,7 @@ class DvgSignal:
 
     def Print(self):
         if self.OK:
-            print("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
+            logger.info("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
 
 
 # 该块用于比较的那个点位
