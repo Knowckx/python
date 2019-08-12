@@ -18,6 +18,8 @@ def GetLogHandle():
 logger = GetLogHandle()
 
 
+
+
 # -----------------Main Start-----------------
 
 # 入口
@@ -194,30 +196,49 @@ class DvgSet:
         bokL10 = self.BlockL10
 
         modL,modR = "",""
+
         mSet = DvgSignal()
-        # mSet.Print()
 
         if self.IsBokL10Valid(): # 是否是标准的双块背离呢
             mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
             rst = mSet.IsDvg()
-            if rst:
-                # logger.info("find Block Dvg")
-                modL = "2.0"
-                modR = "1.0"
+            if rst:  
+                modL = "10"  # 默认简单双块背离
+                modR = "5"
+
+            rst2 = mSet.IsDvgPatchTypeA()
+            if rst2 == False:
+                modL = "10(Filter)" # 左侧被过滤掉了
+                modR = ""
 
         if bokL5.SetTyB.OK:
-            modR = "1.1"
+            modR = "5.2" # 右侧是块内背离！
 
-        if modR == "":
-            # logger.info("<--- None Out")
+        if modL == "" and modR == "":
             return 0
-        logger.info("---> New DVG  time:%s "%(self.DF.time.iat[-1]))
-        logger.info("flag:{} || mode:{} -- {}".format(self.F_hl,modL,modR))
+
+
+        dvgTime = self.DF.time.iat[-1]
+        modmsg  = modL + " " + modR
+
+        if modL == "10(Filter)" and modR == "": #虽然背离，但是被过滤了
+            msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,modmsg)
+            logger.info(msg)
+            return 0
+
+        logger.info("---> New DVG  time:%s "%(dvgTime))
+        logger.info("flag:{} || mode:{}".format(self.F_hl,modmsg))
         mSet.Print()
         bokL5.SetTyB.Print()
         logger.info("\n")
-        return self.F_hl
+        return self.F_hl  # 买入 or 卖出信号
 
+
+    # DvgRstMap = {}
+    # DvgRstMap[1] = "2.0 1.1" #双块 + 块内
+    # DvgRstMap[2] = "1.1" # 单纯块内
+    # DvgRstMap[3] = "2.0 1.0" #双块
+    # DvgRstMap[11] = "TypeA Filter" #双块 但是不满足条件
 
 #　obj represent macd Block
 class Block:
@@ -289,10 +310,23 @@ class DvgSignal:
         self.RU.Init(df, idxR)
         self.F_hl = f_hl
 
+    # typeA类型的背离
     def InitBlock2(self, lu, ru, f_hl):
         self.LU = lu
         self.RU = ru
         self.F_hl = f_hl
+        self.Type = "TypeA"
+    
+    # GN03
+    def IsDvgPatchTypeA(self):
+        if self.Type != "TypeA":
+            return True #默认背离有效
+        AvgL = (self.LU.Mdea + self.LU.Mdif)/2
+        AvgR = (self.RU.Mdea + self.RU.Mdif)/2
+        if (AvgR*AvgL)>0 and abs(AvgL) < abs(AvgR):
+            return False
+        return True
+
 
     def IsDvg(self):
         f_hl = self.F_hl
@@ -322,6 +356,8 @@ class DvgUnit:
         self.Pv = df.loc[idx, 'close']
         self.Mv = df.loc[idx, 'macd']
         self.Time = df.loc[idx, 'time']
+        self.Mdea = df.loc[idx, 'dea']
+        self.Mdif = df.loc[idx, 'dif']
 
 
 # ----------------- struct -----------------
@@ -334,6 +370,7 @@ class ExtmCheckRst:
         self.F_hl = checkRst
         self.Idx = idx
 
+        
 
 # ----------------- Func -----------------
 

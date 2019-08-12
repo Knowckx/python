@@ -12,12 +12,16 @@ def test():
 
     # startData = "2013-12-27 00:00:00"
     startData = "2019-08-02 15:00:00"
+    # startData = "2019-08-09 14:50:00"
+
+
+    
 
     idx = GetDateIndex(df,startData)
     while idx < df.index[-1]:
         dftest = df.loc[idx-200:idx]
         # print(dftest[-1:])
-        dvg.Start(dftest)
+        dvg.Start(dftest,"5m")
         idx +=1
 
 FormatDateTime = "%Y-%m-%d %H:%M:%S"
