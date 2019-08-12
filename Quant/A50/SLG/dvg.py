@@ -234,11 +234,6 @@ class DvgSet:
         return self.F_hl  # 买入 or 卖出信号
 
 
-    # DvgRstMap = {}
-    # DvgRstMap[1] = "2.0 1.1" #双块 + 块内
-    # DvgRstMap[2] = "1.1" # 单纯块内
-    # DvgRstMap[3] = "2.0 1.0" #双块
-    # DvgRstMap[11] = "TypeA Filter" #双块 但是不满足条件
 
 #　obj represent macd Block
 class Block:
