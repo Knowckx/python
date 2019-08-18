@@ -38,18 +38,18 @@ def Start(df,grade = "1d"):
     return dvgrst
 
 # DVG判断修正参数,防止接近新高但是未到，却背离的情况
-DvgExtmFixPara = 0.0015 
+DvgExtmFixPara = 0.0018 
 def SetGradeFixPara(grade):
     global DvgExtmFixPara
     default = DvgExtmFixPara
     if grade == "1d":
         DvgExtmFixPara = default
     if grade == "60m":
-        DvgExtmFixPara = default/4
+        DvgExtmFixPara = default/2
     if grade == "15m":
-        DvgExtmFixPara = default/4/4
+        DvgExtmFixPara = default/2/2
     if grade == "5m":
-        DvgExtmFixPara = default/4/4/3
+        DvgExtmFixPara = default/2/2/1.5
 
 # price now is extremum and turn  va -1 lowest 1 hight 0 normal
 def IsExtmAndTurn(clList):
@@ -264,8 +264,10 @@ class Block:
         self.TLe = df.loc[self.ILe,"time"]
         self.TRi = df.loc[self.IRi,"time"]
 
-        idxP = df.close.idxmin()  # if f_hl = -1
-        idxM = df.macd.idxmin()
+        idxP,idxM = 0,0
+        if f_hl == -1:
+            idxP = df.close.idxmin()  # if f_hl = -1
+            idxM = df.macd.idxmin()
         if f_hl == 1:
             idxP = df.close.idxmax()
             idxM = df.macd.idxmax()
