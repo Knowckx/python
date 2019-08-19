@@ -108,9 +108,12 @@ class DvgSet:
         h_l = self.F_hl
         idxTar = clList.index[-2] #默认[-2]位置是极值。因为前面已经有检查
 
-        # 剔除反向段。下跌时。
+        # GN02 剔除反向段。 
         if h_l == -1: 
             if df.macd.at[idxTar-1] < df.macd.at[idxTar]: #背离点的M值必须更小
+                return tempbok
+        if h_l == 1: 
+            if df.macd.at[idxTar-1] > df.macd.at[idxTar]: #背离点的M值必须更小
                 return tempbok
 
         # 先检查一下，是否是 单点背离 - 反色 的形态
