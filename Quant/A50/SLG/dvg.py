@@ -1,5 +1,7 @@
 import pandas as pd
 import logging
+import datetime
+
 # from .c_dvg import *
 
 '''
@@ -17,9 +19,6 @@ def GetLogHandle():
 
 logger = GetLogHandle()
 
-
-
-
 # -----------------Main Start-----------------
 
 # 入口
@@ -29,7 +28,7 @@ def Start(df,grade = "1d"):
     rst = IsExtmAndTurn(df.close)
     if rst.F_hl == 0:
         # logger.info("IsExtmAndTurn false,continue")
-        return 0
+        return DvgRst()
     
     # 此时[-2]位置一定是极值！
     dvg = DvgSet(df,rst.F_hl)
@@ -201,6 +200,7 @@ class DvgSet:
         modL,modR = "",""
 
         mSet = DvgSignal()
+        mRst = DvgRst()
 
         if self.IsBokL10Valid(): # 是否是标准的双块背离呢
             mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
@@ -218,7 +218,7 @@ class DvgSet:
             modR = "5.2" # 右侧是块内背离！
 
         if modL == "" and modR == "":
-            return 0
+            return mRst
 
 
         dvgTime = self.DF.time.iat[-1]
@@ -227,14 +227,14 @@ class DvgSet:
         if modL == "10(Filter)" and modR == "": #虽然背离，但是被过滤了
             msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,modmsg)
             logger.info(msg)
-            return 0
+            return mRst
 
-        logger.info("---> New DVG  time:%s "%(dvgTime))
-        logger.info("flag:{} || mode:{}".format(self.F_hl,modmsg))
-        mSet.Print()
-        bokL5.SetTyB.Print()
-        logger.info("\n")
-        return self.F_hl  # 买入 or 卖出信号
+        # 看来是有效的
+        mRst.F_hl = self.F_hl
+        mRst.Time = dvgTime
+        mRst.Mode = modmsg
+        mRst.Detail = "{} {}".format(mSet.String(),bokL5.SetTyB.String())
+        return mRst
 
 
 
@@ -339,9 +339,13 @@ class DvgSignal:
         return self.OK
 
     def Print(self):
-        if self.OK:
-            logger.info("DvgSignal:[L,%s R,%s]" % (self.LU.Time, self.RU.Time))
+        self.String()
 
+    def String(self):
+        ss = ""
+        if self.OK:
+            ss = "DvgSignal:[L,{} R,{}]".format(self.LU.Time, self.RU.Time)
+        return ss
 
 # 该块用于比较的那个点位
 class DvgUnit:
@@ -370,7 +374,33 @@ class ExtmCheckRst:
         self.F_hl = checkRst
         self.Idx = idx
 
-        
+# 表达背离结果
+class DvgRst:
+    def __init__(self):
+        self.F_hl = 0  # 背离信号类别 0表示非背离
+        self.Time = "" # 时间
+        self.Mode = "" # 模式
+        self.Detail = "" # 详细点位
+    
+    def ToPyTime(self):
+        year_s, mon_s, day_s = self.Time.split('-')
+        self.Time = datetime.datetime(int(year_s), int(mon_s), int(day_s))
+
+    def IsSame(self,inRst):
+        inRst.ToPyTime()
+        if inRst.F_hl == self.F_hl and inRst.Time == self.Time:
+            return True
+        return False
+
+
+    def String(self):
+        return "time:{} flag:{}".format(self.Time,self.F_hl)
+
+    def Print(self):
+        logger.info(self.String())
+        # logger.info(" || mode:{}".format(,self.Mode))
+        # logger.info(self.Detail)
+        logger.info("\n")
 
 # ----------------- Func -----------------
 

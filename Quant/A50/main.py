@@ -1,16 +1,19 @@
 import Quant.A50.data.csv as csv
 import Quant.A50.SLG.dvg as dvg
+import Quant.A50.SLG.BackTest as bt
 import datetime
 
 
 
 def test():
     # tarFile = '000925.XSHG_5m'
-    tarFile = '000925.XSHG_1d'
+    srcFile = '000925.XSHG_1d'
+    shName = '1d'
+    bTest = bt.BackTest(shName)
+    df = csv.GetPDdata(srcFile)  # data prepare
 
-    df = csv.GetPDdata(tarFile)  # data prepare
-
-    # print(df[-1:])  # test DF
+    bTest.StartWith(df)
+    return
 
     # startData = "2013-12-27 00:00:00"
     startData = "2019-01-01 00:00:00"
