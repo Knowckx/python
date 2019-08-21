@@ -4,29 +4,34 @@ import Quant.A50.SLG.BackTest as bt
 import datetime
 
 
-
-def test():
-    # tarFile = '000925.XSHG_5m'
+def StartBTest():
     srcFile = '000925.XSHG_1d'
     shName = '1d'
     bTest = bt.BackTest(shName)
     df = csv.GetPDdata(srcFile)  # data prepare
 
-    bTest.StartWith(df)
-    return
+    bTest.StartWith(df) 
+
+
+def test():
+    # StartBTest()
+    # tarFile = '000925.XSHG_5m'
+    srcFile = '000925.XSHG_1d'
 
     # startData = "2013-12-27 00:00:00"
+    # startData = "2019-03-07 00:00:00"
     startData = "2019-01-01 00:00:00"
-    # startData = "2019-08-09 14:50:00"
 
-
-    
+    df = csv.GetPDdata(srcFile)  # data prepare
 
     idx = GetDateIndex(df,startData)
     while idx < df.index[-1]:
         dftest = df.loc[idx-200:idx]
         # print(dftest[-1:])
-        dvg.Start(dftest,"1d")
+        rst = dvg.Start(dftest,"1d")
+        if (rst.F_hl !=0):
+            # print(rst.String())
+            rst.Print()
         idx +=1
 
 FormatDateTime1 = "%Y-%m-%d"

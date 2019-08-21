@@ -85,7 +85,7 @@ class DvgSet:
     def Go(self):
         rstL5 = self.GetBlockL5()
         if rstL5 == False:
-            return 0
+            return DvgRst()
         self.GetBlockL10()  # only L5 is TypeB is Possible
 
         return self.FinalLog()
@@ -333,9 +333,11 @@ class DvgSignal:
         if f_hl == 1:  # red
             if self.RU.Pv >= self.LU.Pv*(1 - DvgExtmFixPara) and self.RU.Mv <= self.LU.Mv:
                 self.OK = True
+                self.Rate = round(self.RU.Mv/self.LU.Mv,3)
         if f_hl == -1:
             if self.RU.Pv <= self.LU.Pv*(1 + DvgExtmFixPara) and self.RU.Mv >= self.LU.Mv:
                 self.OK = True
+                self.Rate = round(self.RU.Mv/self.LU.Mv,3)
         return self.OK
 
     def Print(self):
@@ -344,7 +346,7 @@ class DvgSignal:
     def String(self):
         ss = ""
         if self.OK:
-            ss = "DvgSignal:[L,{} R,{}]".format(self.LU.Time, self.RU.Time)
+            ss = "[L,{} R,{} rate,{}]".format(self.LU.Time, self.RU.Time,self.Rate)
         return ss
 
 # 该块用于比较的那个点位
@@ -399,7 +401,7 @@ class DvgRst:
     def Print(self):
         logger.info(self.String())
         # logger.info(" || mode:{}".format(,self.Mode))
-        # logger.info(self.Detail)
+        logger.info(self.Detail)
         logger.info("\n")
 
 # ----------------- Func -----------------
