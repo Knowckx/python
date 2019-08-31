@@ -198,42 +198,43 @@ class DvgSet:
         bokL10 = self.BlockL10
 
         modL,modR = "",""
+        rstL,rstR = False,False
 
-        mSet = DvgSignal()
+        TyASet = DvgSignal() # 专门用来判断双块
         mRst = DvgRst()
 
         if self.IsBokL10Valid(): # 是否是标准的双块背离呢
-            mSet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
-            rst = mSet.IsDvg()
-            if rst:  
+            TyASet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
+            rstL = TyASet.IsDvg()
+            if rstL:  
                 modL = "10"  # 默认简单双块背离
                 modR = "5"
-
-            rst2 = mSet.IsDvgPatchTypeA()
-            if rst2 == False:
-                modL = "10(Filter)" # 左侧被过滤掉了
+            elif TyASet.Note != "":
+                modL = "10({})".format(TyASet.Note) # 左侧被过滤掉了
                 modR = ""
 
-        if bokL5.SetTyB.OK:
+        rstR = bokL5.SetTyB.OK
+        if rstR:
             modR = "5.2" # 右侧是块内背离！
+        elif bokL5.SetTyB.Note != "":
+            modR = "5.2({})".format(bokL5.SetTyB.Note) # 右侧被过滤掉了
+
+        mRst.Mode = modL + " " + modR
 
         if modL == "" and modR == "":
             return mRst
 
-
         dvgTime = self.DF.time.iat[-1]
-        modmsg  = modL + " " + modR
 
-        if modL == "10(Filter)" and modR == "": #虽然背离，但是被过滤了
-            msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,modmsg)
+        if not rstL and not rstR: # 两边都失败了
+            msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,mRst.Mode)
             logger.info(msg)
             return mRst
 
         # 看来是有效的
         mRst.F_hl = self.F_hl
         mRst.Time = dvgTime
-        mRst.Mode = modmsg
-        mRst.Detail = "{} {}".format(mSet.String(),bokL5.SetTyB.String())
+        mRst.Detail = "{} {}".format(TyASet.String(),bokL5.SetTyB.String())
         return mRst
 
 
@@ -283,7 +284,6 @@ class Block:
 
         # Try TyB  
         self.SetTyB.InitPoint2(df, idxM, idxP, f_hl)
-        self.SetTyB.IsDvg()
         return
 
     def Len(self):
@@ -301,6 +301,8 @@ class DvgSignal:
         self.RU = DvgUnit()
         self.F_hl = 0
         self.OK = False
+        self.Type = ""#背离类型
+        self.Note = ""#背离为什么被剔除
 
     # two point
     def InitPoint2(self, df, idxL, idxR, f_hl):
@@ -309,6 +311,8 @@ class DvgSignal:
         self.LU.Init(df, idxL)
         self.RU.Init(df, idxR)
         self.F_hl = f_hl
+        self.IsDvg()
+
 
     # typeA类型的背离
     def InitBlock2(self, lu, ru, f_hl):
@@ -317,16 +321,25 @@ class DvgSignal:
         self.F_hl = f_hl
         self.Type = "TypeA"
     
-    # GN03
-    def IsDvgPatchTypeA(self):
+    # GN03 对于typeA 要求M线值也背离
+    def IsDvgGN03(self):
         if self.Type != "TypeA":
             return True #默认背离有效
-        AvgL = (self.LU.Mdea + self.LU.Mdif)/2
-        AvgR = (self.RU.Mdea + self.RU.Mdif)/2
+        AvgL = self.LU.MLine
+        AvgR = self.RU.MLine
         if (AvgR*AvgL)>0 and abs(AvgL) < abs(AvgR):
+            self.OK = False
+            self.Note = "Filter by GN03"
             return False
         return True
 
+    # GN04 顶背离时，左侧的M线值必须为正  False == 被过滤
+    def IsDvgGN04(self):
+        if self.F_hl * self.LU.MLine < 0: 
+            self.OK = False
+            self.Note = "Filter by GN04"
+            return False
+        return True
 
     def IsDvg(self):
         f_hl = self.F_hl
@@ -338,6 +351,14 @@ class DvgSignal:
             if self.RU.Pv <= self.LU.Pv*(1 + DvgExtmFixPara) and self.RU.Mv >= self.LU.Mv:
                 self.OK = True
                 self.Rate = round(self.RU.Mv/self.LU.Mv,3)
+
+        if self.IsDvgGN03() == False:
+            return self.OK
+
+        if self.IsDvgGN04() == False:
+            return self.OK
+
+            
         return self.OK
 
     def Print(self):
@@ -362,8 +383,7 @@ class DvgUnit:
         self.Pv = df.loc[idx, 'close']
         self.Mv = df.loc[idx, 'macd']
         self.Time = df.loc[idx, 'time']
-        self.Mdea = df.loc[idx, 'dea']
-        self.Mdif = df.loc[idx, 'dif']
+        self.MLine = (df.loc[idx, 'dea'] + df.loc[idx, 'dif'])/2
 
 
 # ----------------- struct -----------------
@@ -400,7 +420,7 @@ class DvgRst:
 
     def Print(self):
         logger.info(self.String())
-        # logger.info(" || mode:{}".format(,self.Mode))
+        logger.info(self.Mode)
         logger.info(self.Detail)
         logger.info("\n")
 

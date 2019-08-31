@@ -19,8 +19,8 @@ def test():
     srcFile = '000925.XSHG_1d'
 
     # startData = "2013-12-27 00:00:00"
-    # startData = "2019-03-07 00:00:00"
-    startData = "2019-01-01 00:00:00"
+    # startData = "2019-02-26 00:00:00"
+    startData = "2018-01-01 00:00:00"
 
     df = csv.GetPDdata(srcFile)  # data prepare
 
