@@ -67,7 +67,7 @@ def IsExtmAndTurn(clList):
 
 # --------------------------------------------Class区--------------------------------------------
 
-# experience args
+# 经验参数
 RecnetBarsLen = 100
 ExtmCheckLen = 20 # #20天差不多了，上涨中的回调产生的背离大概间隔20天
 
@@ -77,18 +77,20 @@ class DvgSet:
     def __init__(self, df, f_hl):  # given a invaild block
         self.DF = df  # target df datas
         self.F_hl = f_hl
-        self.BlockL5 = Block()  
+        self.BlockL5 = Block()  # 块内背离在这里检查
         self.BlockL10 = Block() 
-        self.DvgSignal = DvgSignal() 
+        self.TyASet = DvgSignal() # 双块背离的检查
+        self.DvgRst = DvgRst() # 本次背离的判断结果
 
     # P1 P2
     def Go(self):
         rstL5 = self.GetBlockL5()
         if rstL5 == False:
             return DvgRst()
-        self.GetBlockL10()  # only L5 is TypeB is Possible
-
-        return self.FinalLog()
+        self.GetBlockL10()
+        self.BaseLog()
+        self.PatchLog()
+        return self.DvgRst
 
     # P1 dig Block L5
     def GetBlockL5(self):
@@ -100,28 +102,21 @@ class DvgSet:
         self.BlockL5 = bok
 
     # func1 given index_right,given ask [high,1,red or low,-1,green] to find the wholeblock
-    # return the block with DF[left , right]
+    # 鉴定右块的左右边界 
     def DigBlockWithPoint(self, df):
         tempbok = Block()
         clList = df.close[-ExtmCheckLen:]  #收盘价列表
         h_l = self.F_hl
         idxTar = clList.index[-2] #默认[-2]位置是极值。因为前面已经有检查
 
-        # GN02 剔除反向段。 
-        if h_l == -1: 
-            if df.macd.at[idxTar-1] < df.macd.at[idxTar]: #背离点的M值必须更小
-                return tempbok
-        if h_l == 1: 
-            if df.macd.at[idxTar-1] > df.macd.at[idxTar]: #背离点的M值必须更小
-                return tempbok
-
-        # 先检查一下，是否是 单点背离 - 反色 的形态
+        # 是否是 单点背离 - 反色 的形态
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
             # logger.info("not sync. block is a point")
             return tempbok
 
+        # 普通的块背离
         return self.DigCommonBlock(df)
 
     def DigCommonBlock(self, df):
@@ -155,7 +150,7 @@ class DvgSet:
         logger.info(msg)
         return -1
 
-    # 给出符合长度的block
+    # 尝试寻找左块 - 非必须
     def GetBlockL10(self):
         idxNow = self.BlockL5.ILe-1
         df = self.DF.loc[:idxNow]
@@ -178,68 +173,66 @@ class DvgSet:
             idxNow = tempLe - 1
         return 
 
-    # L10是否有效
-    def IsBokL10Valid(self):
+    # 基础背离判断
+    def BaseLog(self):
+        self.DvgRst = DvgRst() # 本函数返回的结果集
         bokL5 = self.BlockL5
         bokL10 = self.BlockL10
-        if not bokL10.IsValid():
-            return False
-        f_hl = self.F_hl
-        if f_hl == 1:  # red
-            if bokL10.Mv <= bokL5.Mv:
-                return False
-        if f_hl == -1:
-            if bokL10.Mv >= bokL5.Mv:
-                return False
-        return True
-
-    def FinalLog(self):
-        bokL5 = self.BlockL5
-        bokL10 = self.BlockL10
-
         modL,modR = "",""
-        rstL,rstR = False,False
 
-        TyASet = DvgSignal() # 专门用来判断双块
-        mRst = DvgRst()
-
-        if self.IsBokL10Valid(): # 是否是标准的双块背离呢
-            TyASet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
-            rstL = TyASet.IsDvg()
-            if rstL:  
+        # 进入基础判断
+        if self.BlockL10.IsValid(): # 左块是有效的话
+            self.TyASet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
+            rst = self.TyASet.IsDvg()
+            if rst:  
                 modL = "10"  # 默认简单双块背离
                 modR = "5"
-            elif TyASet.Note != "":
-                modL = "10({})".format(TyASet.Note) # 左侧被过滤掉了
-                modR = ""
 
-        rstR = bokL5.SetTyB.OK
-        if rstR:
-            modR = "5.2" # 右侧是块内背离！
-        elif bokL5.SetTyB.Note != "":
-            modR = "5.2({})".format(bokL5.SetTyB.Note) # 右侧被过滤掉了
+        if bokL5.SetTyB.OK:
+            modR = "5.2" # 右块是TyB！
 
-        mRst.Mode = modL + " " + modR
-
-        if modL == "" and modR == "":
-            return mRst
-
-        dvgTime = self.DF.time.iat[-1]
-
-        if not rstL and not rstR: # 两边都失败了
-            msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,mRst.Mode)
-            logger.info(msg)
-            return mRst
+        if modL == "" and modR == "": #不是背离
+            return
 
         # 看来是有效的
-        mRst.F_hl = self.F_hl
-        mRst.Time = dvgTime
-        mRst.Detail = "{} {}".format(TyASet.String(),bokL5.SetTyB.String())
-        return mRst
+        self.DvgRst.F_hl = self.F_hl
+        self.DvgRst.Time = self.DF.time.iat[-1]
+        self.DvgRst.Mode = modL + " " + modR
+        self.DvgRst.Detail = "{} {}".format(self.TyASet.String(),bokL5.SetTyB.String())
+        return 
+
+    # 加上筛选项的进阶背离判断
+    def PatchLog(self):
+        if self.DvgRst.F_hl == 0:
+            return
+        
+        if self.BlockL5.SetTyB.OK:
+            if self.BlockL5.SetTyB.CheckGN01() == False:
+                self.DvgRst.Patch = "GN01"
+                return
+
+
+        # self.BlockL5.
+
+        # self.DvgRst.IsSame
+                    # rst2 = mSet.IsDvgPatchTypeA()
+            # if rst2 == False:
+            #     modL = "10(Filter)" # 左侧被过滤掉了
+            #     modR = ""
 
 
 
-#　obj represent macd Block
+        # dvgTime = self.DF.time.iat[-1]
+        # modmsg  = modL + " " + modR
+
+        # if modL == "10(Filter)" and modR == "": #虽然背离，但是被过滤了
+        #     msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,modmsg)
+        #     logger.info(msg)
+        #     return mRst
+
+
+
+#　代表一个背离的颜色块
 class Block:
     def __init__(self):  # given a invaild block
         self.ILe = -1  # base info
@@ -282,8 +275,9 @@ class Block:
             # logger.info("Block Desc:Single extm")
             return
 
-        # Try TyB  
+        # 检查TyB的块内背离
         self.SetTyB.InitPoint2(df, idxM, idxP, f_hl)
+        self.SetTyB.IsDvg()
         return
 
     def Len(self):
@@ -301,8 +295,6 @@ class DvgSignal:
         self.RU = DvgUnit()
         self.F_hl = 0
         self.OK = False
-        self.Type = ""#背离类型
-        self.Note = ""#背离为什么被剔除
 
     # two point
     def InitPoint2(self, df, idxL, idxR, f_hl):
@@ -311,8 +303,6 @@ class DvgSignal:
         self.LU.Init(df, idxL)
         self.RU.Init(df, idxR)
         self.F_hl = f_hl
-        self.IsDvg()
-
 
     # typeA类型的背离
     def InitBlock2(self, lu, ru, f_hl):
@@ -320,24 +310,22 @@ class DvgSignal:
         self.RU = ru
         self.F_hl = f_hl
         self.Type = "TypeA"
-    
-    # GN03 对于typeA 要求M线值也背离
-    def IsDvgGN03(self):
-        if self.Type != "TypeA":
-            return True #默认背离有效
-        AvgL = self.LU.MLine
-        AvgR = self.RU.MLine
-        if (AvgR*AvgL)>0 and abs(AvgL) < abs(AvgR):
-            self.OK = False
-            self.Note = "Filter by GN03"
+
+    # GN01 块内背离的两点,M线值必须同正负
+    def CheckGN01(self):
+        AvgL = (self.LU.Mdea + self.LU.Mdif)/2
+        AvgR = (self.RU.Mdea + self.RU.Mdif)/2
+        if (AvgR*AvgL) < 0: 
             return False
         return True
 
-    # GN04 顶背离时，左侧的M线值必须为正  False == 被过滤
-    def IsDvgGN04(self):
-        if self.F_hl * self.LU.MLine < 0: 
-            self.OK = False
-            self.Note = "Filter by GN04"
+    # GN03
+    def IsDvgPatchTypeA(self):
+        if self.Type != "TypeA":
+            return True #默认背离有效
+        AvgL = (self.LU.Mdea + self.LU.Mdif)/2
+        AvgR = (self.RU.Mdea + self.RU.Mdif)/2
+        if (AvgR*AvgL)>0 and abs(AvgL) < abs(AvgR):
             return False
         return True
 
@@ -351,14 +339,6 @@ class DvgSignal:
             if self.RU.Pv <= self.LU.Pv*(1 + DvgExtmFixPara) and self.RU.Mv >= self.LU.Mv:
                 self.OK = True
                 self.Rate = round(self.RU.Mv/self.LU.Mv,3)
-
-        if self.IsDvgGN03() == False:
-            return self.OK
-
-        if self.IsDvgGN04() == False:
-            return self.OK
-
-            
         return self.OK
 
     def Print(self):
@@ -383,7 +363,8 @@ class DvgUnit:
         self.Pv = df.loc[idx, 'close']
         self.Mv = df.loc[idx, 'macd']
         self.Time = df.loc[idx, 'time']
-        self.MLine = (df.loc[idx, 'dea'] + df.loc[idx, 'dif'])/2
+        self.Mdea = df.loc[idx, 'dea']
+        self.Mdif = df.loc[idx, 'dif']
 
 
 # ----------------- struct -----------------
@@ -403,14 +384,20 @@ class DvgRst:
         self.Time = "" # 时间
         self.Mode = "" # 模式
         self.Detail = "" # 详细点位
+        self.Patch = "" # 附加检查
     
     def ToPyTime(self):
         year_s, mon_s, day_s = self.Time.split('-')
         self.Time = datetime.datetime(int(year_s), int(mon_s), int(day_s))
 
     def IsSame(self,inRst):
-        inRst.ToPyTime()
-        if inRst.F_hl == self.F_hl and inRst.Time == self.Time:
+        if inRst.F_hl == 0:
+            return False
+        self.ToPyTime()
+        b1 = inRst.F_hl == self.F_hl
+        b2 = inRst.Time == self.Time
+        b3 = (inRst.Patch == "" and self.Patch == "" ) or (inRst.Patch != "" and self.Patch != "" ) 
+        if b1 and b2 and b3:
             return True
         return False
 
@@ -420,12 +407,35 @@ class DvgRst:
 
     def Print(self):
         logger.info(self.String())
-        logger.info(self.Mode)
-        logger.info(self.Detail)
-        logger.info("\n")
+        # logger.info(" || mode:{}".format(,self.Mode))
+        logger.info(self.Detail + self.Patch)
+        # logger.info("\n")
 
 # ----------------- Func -----------------
 
 
 def DFTime(df, idx):
     return df.loc[idx, 'time']
+
+#--------------------------------------------保留的功能区
+# def test():
+#     # GN02 剔除反向段。 
+#     if h_l == -1: 
+#         if df.macd.at[idxTar-1] < df.macd.at[idxTar]: #背离点的M值必须更小
+#             return tempbok
+#     if h_l == 1: 
+#         if df.macd.at[idxTar-1] > df.macd.at[idxTar]: #背离点的M值必须更小
+#             return tempbok
+
+
+    
+#     if modL == "10(Filter)" and modR == "": #虽然背离，但是被过滤了
+#         msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,modmsg)
+#         logger.info(msg)
+#         return mRst
+
+
+            # rst2 = mSet.IsDvgPatchTypeA()
+            # if rst2 == False:
+            #     modL = "10(Filter)" # 左侧被过滤掉了
+            #     modR = ""

@@ -21,10 +21,12 @@ class BackTest:
     def GetNextVerify(self):
         df = self.verifyDF
         if self.Idx >= len(df):
-            return None
+            return dvg.DvgRst()
         verf = dvg.DvgRst()
         verf.F_hl = df["type"].iat[self.Idx]
         verf.Time = df["time"].iat[self.Idx]
+        if df["Fix"].iat[self.Idx] == 1:
+            verf.Patch = "Fixed"
         self.Idx += 1
         return verf
 
@@ -42,13 +44,13 @@ class BackTest:
             if rst.F_hl == 0:
                 idx -=1
                 continue
-            if ch.IsSame(rst):
-                print("success at tar:{} need:{}".format(rst.Time,ch.Time))
+            rst.Print()
+            if rst.IsSame(ch):
+                print("success at Result:{} Need:{}\n".format(rst.Time,ch.Time))
                 idx -=1
                 ch = self.GetNextVerify()
                 if ch == None:
                     print("finished!!")
-                    return
                 continue
             else:
                 print("stop at tar:{} need:{}".format(rst.Time,ch.Time))

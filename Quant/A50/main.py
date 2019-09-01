@@ -9,12 +9,15 @@ def StartBTest():
     shName = '1d'
     bTest = bt.BackTest(shName)
     df = csv.GetPDdata(srcFile)  # data prepare
-
+    # df = UserDtdPrice(df)
     bTest.StartWith(df) 
 
+# def UserDtdPrice(df):
+#     df.clo  
 
 def test():
-    # StartBTest()
+    StartBTest()  #回测
+    return
     # tarFile = '000925.XSHG_5m'
     srcFile = '000925.XSHG_1d'
 
