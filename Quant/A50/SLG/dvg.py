@@ -17,51 +17,75 @@ def GetLogHandle():
     logger.addHandler(handler)
     return logger
 
+
+# -----------------Init -----------------
 logger = GetLogHandle()
 
+
+# DVG判断修正参数,防止接近新高但是未到，却背离的情况
+DvgExtmFixPara = 0.0018 
+Dvg02Para = 0.03  # DVG02 股价形成非常狭窄的通道时，不再进行背离运算
+def SetGradeFixPara(grade):
+    global DvgExtmFixPara
+    global Dvg02Para
+    fixed = 1
+    if grade == "1d":
+        fixed = 1
+    if grade == "60m":
+        fixed = 2
+    if grade == "15m":
+        fixed = 2*2
+    if grade == "5m":
+        fixed = 2*2*1.5 # 就是6
+    DvgExtmFixPara = DvgExtmFixPara/fixed
+    Dvg02Para = Dvg02Para/fixed
+
+# 这个包需要手动初始化一次
+def Init(grade):
+    SetGradeFixPara(grade)
+    print(Dvg02Para)
 # -----------------Main Start-----------------
 
 # 入口
-def Start(df,grade = "1d"):
-    SetGradeFixPara(grade)
-    # pre is lowest or highest
-    rst = IsExtmAndTurn(df.close)
-    if rst.F_hl == 0:
+def Start(df):
+    rst = CheckDvg02(df)
+    if rst == False:
+        return DvgRst()
+
+    F_hl = IsExtmAndTurn(df.close)
+    if F_hl == 0:
         # logger.info("IsExtmAndTurn false,continue")
         return DvgRst()
-    
-    # 此时[-2]位置一定是极值！
-    dvg = DvgSet(df,rst.F_hl)
+
+
+    dvg = DvgSet(df,F_hl)
     dvgrst = dvg.Go()
     # logger.info(dvgrst)
     return dvgrst
 
-# DVG判断修正参数,防止接近新高但是未到，却背离的情况
-DvgExtmFixPara = 0.0018 
-def SetGradeFixPara(grade):
-    global DvgExtmFixPara
-    default = DvgExtmFixPara
-    if grade == "1d":
-        DvgExtmFixPara = default
-    if grade == "60m":
-        DvgExtmFixPara = default/2
-    if grade == "15m":
-        DvgExtmFixPara = default/2/2
-    if grade == "5m":
-        DvgExtmFixPara = default/2/2/1.5
+def CheckDvg02(df):
+    bollgap = df.bup.iat[-1] - df.blow.iat[-1]
+    # rst = DvgRst()
+    if (bollgap/df.blow.iat[-1] < Dvg02Para):
+        # print("Dvg02 通道过窄,pass")
+        return False
+    return True
+    
 
-# price now is extremum and turn  va -1 lowest 1 hight 0 normal
+# 入口 极值检查   
+# 目前使用 倒数第二天的价格必须是极值
 def IsExtmAndTurn(clList):
-    closeList = clList[-ExtmCheckLen:]
-    taridx = closeList.index[-2]
-    tarP = closeList.iat[-2]
-    minP = closeList.min()
-    if tarP <= minP*(1 + DvgExtmFixPara): # low
-        return ExtmCheckRst(-1, taridx)
-    maxP = closeList.max()
-    if tarP >= maxP*(1 - DvgExtmFixPara):
-        return ExtmCheckRst(1, taridx)
-    return ExtmCheckRst(0, -1)
+    closeList = clList[-ExtmCheckLen:] # 收盘价数组
+    # taridx = closeList.index[-1]
+    tarP1 = closeList.iat[-1] 
+    tarP2 = closeList.iat[-2] 
+    fixminP = closeList.min()*(1 + DvgExtmFixPara)
+    if tarP1 <= fixminP or tarP2 <= fixminP: 
+        return -1
+    fixmaxP = closeList.max()*(1 - DvgExtmFixPara)
+    if tarP1 >= fixmaxP or tarP2 >= fixmaxP:
+        return 1
+    return 0
 
 
 
@@ -105,19 +129,18 @@ class DvgSet:
     # 鉴定右块的左右边界 
     def DigBlockWithPoint(self, df):
         tempbok = Block()
-        clList = df.close[-ExtmCheckLen:]  #收盘价列表
         h_l = self.F_hl
-        idxTar = clList.index[-2] #默认[-2]位置是极值。因为前面已经有检查
-
+        idxTar = GetLocalExtm(df,h_l)
         # 是否是 单点背离 - 反色 的形态
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
             # logger.info("not sync. block is a point")
             return tempbok
-
         # 普通的块背离
         return self.DigCommonBlock(df)
+    
+
 
     def DigCommonBlock(self, df):
         tempbok = Block()
@@ -261,16 +284,24 @@ class Block:
         self.TLe = df.loc[self.ILe,"time"]
         self.TRi = df.loc[self.IRi,"time"]
 
-        idxP,idxM = 0,0
-        if f_hl == -1:
-            idxP = df.close.idxmin()  # if f_hl = -1
-            idxM = df.macd.idxmin()
-        if f_hl == 1:
-            idxP = df.close.idxmax()
-            idxM = df.macd.idxmax()
+        idxP = GetLocalExtm(df,f_hl)  # 本块的价格极值点
+        self.RepUn.Init(df, idxP)    # 本块总是由价格极值代表
 
+        # 向左找的较大点的M块极值点
+        idxM = idxP
+        while (idxM > self.ILe):
+            idxM -= 1  # 左移动
+            tempLis = df.macd.loc[idxM-3:idxM]
+            # print(tempLis)
+            if f_hl == -1:
+                if tempLis.idxmin() == idxM:
+                    break
+            if f_hl == 1:
+                if tempLis.idxmax() == idxM:
+                    break
+        # print(df.loc[idxM,"time"])
         self.Mv = self.DF.loc[idxM,"macd"] # 保存一下本块的MACD极值
-        self.RepUn.Init(df, idxP)  # 总是由极值代表
+        
         if idxP == idxM:
             # logger.info("Block Desc:Single extm")
             return
@@ -313,9 +344,9 @@ class DvgSignal:
 
     # GN01 块内背离的两点,M线值必须同正负
     def CheckGN01(self):
-        AvgL = (self.LU.Mdea + self.LU.Mdif)/2
-        AvgR = (self.RU.Mdea + self.RU.Mdif)/2
-        if (AvgR*AvgL) < 0: 
+        AvgMvL = (self.LU.Mdea + self.LU.Mdif)/2
+        AvgMvR = (self.RU.Mdea + self.RU.Mdif)/2
+        if (AvgMvL*AvgMvR) < 0: 
             return False
         return True
 
@@ -368,14 +399,6 @@ class DvgUnit:
 
 
 # ----------------- struct -----------------
-class ExtmCheckRst:
-    def __init__(self):
-        self.F_hl = 0
-        self.Idx = -1
-
-    def __init__(self, checkRst, idx):
-        self.F_hl = checkRst
-        self.Idx = idx
 
 # 表达背离结果
 class DvgRst:
@@ -387,13 +410,15 @@ class DvgRst:
         self.Patch = "" # 附加检查
     
     def ToPyTime(self):
-        year_s, mon_s, day_s = self.Time.split('-')
-        self.Time = datetime.datetime(int(year_s), int(mon_s), int(day_s))
+        FormatDate = "%Y-%m-%d %H:%M:%S"
+        if len(self.Time) == 10:
+            FormatDate = "%Y-%m-%d"
+        self.Time = datetime.datetime.strptime(self.Time, FormatDate)
 
     def IsSame(self,inRst):
         if inRst.F_hl == 0:
             return False
-        self.ToPyTime()
+        # self.ToPyTime()
         b1 = inRst.F_hl == self.F_hl
         b2 = inRst.Time == self.Time
         b3 = (inRst.Patch == "" and self.Patch == "" ) or (inRst.Patch != "" and self.Patch != "" ) 
@@ -417,6 +442,14 @@ class DvgRst:
 def DFTime(df, idx):
     return df.loc[idx, 'time']
 
+
+# 最近的两个点中，实际被选出的点的idx
+def GetLocalExtm(df,h_l):
+    clList = df.close[-2:]  # 在我们的模型中，最近两个bar一定有一个代表点
+    idxTar = clList.idxmax() 
+    if h_l == -1:
+        idxTar = clList.idxmin()
+    return idxTar
 #--------------------------------------------保留的功能区
 # def test():
 #     # GN02 剔除反向段。 
