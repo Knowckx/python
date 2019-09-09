@@ -28,6 +28,8 @@ class BackTest:
             if len(dftest) < gap:
                 break
             rst = dvg.Start(dftest) # 开始
+            # print(dftest.time.iat[-1])
+            
             if rst.F_hl == 0:
                 idx -=1
                 continue

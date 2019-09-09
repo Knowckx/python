@@ -48,6 +48,9 @@ def Init(grade):
 
 # 入口
 def Start(df):
+    # debugP = '2019-09-05 15:00:00'
+    # if df.time.iloc[-1] == debugP:
+    #     print(debugP)
     rst = CheckDvg02(df)
     if rst == False:
         return DvgRst()
@@ -76,31 +79,29 @@ def CheckDvg02(df):
 # 目前使用 倒数第二天的价格必须是极值
 def IsExtmAndTurn(clList):
     closeList = clList[-ExtmCheckLen:] # 收盘价数组
+    flag = 0
     tarP1 = closeList.iat[-1]  # 最近两天的价格与坐标
     idxP1 =  closeList.index[-1]
     tarP2 = closeList.iat[-2] 
     idxP2 =  closeList.index[-2]
 
-    flag = 0
-    # 最小值的情况下
-    minidx = closeList.idxmin()
-    fixminP = closeList.min()*(1 + DvgExtmFixPara)
-    if minidx != idxP1:  #极限值不是今天
-        if tarP1 <= fixminP: # 今天值进入范围了
-            return -1
-    else:  #极限值就是今天
-        if tarP1 >= tarP2*(1 - DvgExtmFixPara):
-            return -1
-        
+    localList = closeList[-ExtmCheckLen:-2] #不包含今天和昨天
+    # print(len(closeList))
+    # print(closeList[-5:])   
+
+    
+    minidx = localList.idxmin() #不包含今天和昨天
+    fixminP = localList.loc[minidx]*(1 + DvgExtmFixPara)
+
+    # 希望昨天是个低值  同时今天比昨天要缓和
+    if tarP2 <= fixminP and tarP1 >= tarP2*(1 - DvgExtmFixPara):
+        return -1
+
     # 最大值的情况下
-    maxidx = closeList.idxmax()
-    fixmaxP = closeList.max()*(1 - DvgExtmFixPara)
-    if minidx != idxP1:  #极限值不是今天
-        if tarP1 >= fixminP: # 今天值进入范围了
-            return 1
-    else:  #极限值就是今天,不要太高了
-        if tarP1 <= tarP2*(1 + DvgExtmFixPara):
-            return 1    
+    maxidx = localList.idxmax()
+    fixmaxP = localList.loc[maxidx]*(1 - DvgExtmFixPara)
+    if tarP2 >= fixmaxP and tarP1 <= tarP2*(1 + DvgExtmFixPara):
+        return -1
     return 0
 
 # --------------------------------------------Class区--------------------------------------------
