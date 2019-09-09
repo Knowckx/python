@@ -25,7 +25,7 @@ def test():
     srcFile = '000925.XSHG_5m'
     df = csv.GetPDdata(srcFile)  # data prepare
 
-    startData = "2019-09-05 15:00:00"
+    startData = "2019-09-05 14:20:00"
     # startData = "2017-09-29"
 
     dvg.Init('5m')

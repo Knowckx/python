@@ -43,7 +43,7 @@ def SetGradeFixPara(grade):
 # 这个包需要手动初始化一次
 def Init(grade):
     SetGradeFixPara(grade)
-    print(Dvg02Para)
+    # print(Dvg02Para)
 # -----------------Main Start-----------------
 
 # 入口
@@ -76,18 +76,32 @@ def CheckDvg02(df):
 # 目前使用 倒数第二天的价格必须是极值
 def IsExtmAndTurn(clList):
     closeList = clList[-ExtmCheckLen:] # 收盘价数组
-    # taridx = closeList.index[-1]
-    tarP1 = closeList.iat[-1] 
+    tarP1 = closeList.iat[-1]  # 最近两天的价格与坐标
+    idxP1 =  closeList.index[-1]
     tarP2 = closeList.iat[-2] 
+    idxP2 =  closeList.index[-2]
+
+    flag = 0
+    # 最小值的情况下
+    minidx = closeList.idxmin()
     fixminP = closeList.min()*(1 + DvgExtmFixPara)
-    if tarP1 <= fixminP or tarP2 <= fixminP: 
-        return -1
+    if minidx != idxP1:  #极限值不是今天
+        if tarP1 <= fixminP: # 今天值进入范围了
+            return -1
+    else:  #极限值就是今天
+        if tarP1 >= tarP2*(1 - DvgExtmFixPara):
+            return -1
+        
+    # 最大值的情况下
+    maxidx = closeList.idxmax()
     fixmaxP = closeList.max()*(1 - DvgExtmFixPara)
-    if tarP1 >= fixmaxP or tarP2 >= fixmaxP:
-        return 1
+    if minidx != idxP1:  #极限值不是今天
+        if tarP1 >= fixminP: # 今天值进入范围了
+            return 1
+    else:  #极限值就是今天,不要太高了
+        if tarP1 <= tarP2*(1 + DvgExtmFixPara):
+            return 1    
     return 0
-
-
 
 # --------------------------------------------Class区--------------------------------------------
 
