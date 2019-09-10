@@ -48,16 +48,19 @@ def Init(grade):
 
 # 入口
 def Start(df):
-    # debugP = '2019-09-05 15:00:00'
-    # if df.time.iloc[-1] == debugP:
-    #     print(debugP)
+    debugP = '2019-09-05 10:20:00'
+    if df.time.iloc[-1] == debugP:
+        print("debug" + debugP)
     rst = CheckDvg02(df)
     if rst == False:
         return DvgRst()
 
     F_hl = IsExtmAndTurn(df.close)
     if F_hl == 0:
-        # logger.info("IsExtmAndTurn false,continue")
+        return DvgRst()
+
+    rst = CheckDvg03(df,F_hl)
+    if rst == False:
         return DvgRst()
 
 
@@ -73,7 +76,17 @@ def CheckDvg02(df):
         # print("Dvg02 通道过窄,pass")
         return False
     return True
-    
+
+# 知道方向后，进行反向段检查，因为反向段很容易出现新高
+def CheckDvg03(df,F_hl):
+    m1 = df.macd.iat[-1]
+    m2 = df.macd.iat[-2]
+    m3 = df.macd.iat[-3]
+    if F_hl == 1 and m3 > m2 and m2 > m1: # 只对顶背离生效
+        return False
+    # if F_hl == -1 and m3 < m2 and m2 < m1:
+    #     return False
+    return True
 
 # 入口 极值检查   
 # 目前使用 倒数第二天的价格必须是极值
@@ -101,7 +114,7 @@ def IsExtmAndTurn(clList):
     maxidx = localList.idxmax()
     fixmaxP = localList.loc[maxidx]*(1 - DvgExtmFixPara)
     if tarP2 >= fixmaxP and tarP1 <= tarP2*(1 + DvgExtmFixPara):
-        return -1
+        return 1
     return 0
 
 # --------------------------------------------Class区--------------------------------------------
