@@ -480,13 +480,8 @@ def GetLocalExtm(df,h_l):
     return idxTar
 #--------------------------------------------保留的功能区
 # def test():
-#     # GN02 剔除反向段。 
-#     if h_l == -1: 
-#         if df.macd.at[idxTar-1] < df.macd.at[idxTar]: #背离点的M值必须更小
-#             return tempbok
-#     if h_l == 1: 
-#         if df.macd.at[idxTar-1] > df.macd.at[idxTar]: #背离点的M值必须更小
-#             return tempbok
+
+
 
 
     
