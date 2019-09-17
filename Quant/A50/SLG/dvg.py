@@ -48,10 +48,10 @@ def Init(grade):
 
 # 入口
 def Start(df):
-    debugP = '2019-09-05 10:20:00'
-    if df.time.iloc[-1] == debugP:
-        print("debug" + debugP)
-    rst = CheckDvg02(df)
+    # debugP = '2019-09-05 10:40:00'
+    # if df.time.iloc[-1] == debugP:
+    #     print("debug at" + debugP)
+    rst = EnterCheck(df)
     if rst == False:
         return DvgRst()
 
@@ -59,17 +59,16 @@ def Start(df):
     if F_hl == 0:
         return DvgRst()
 
-    rst = CheckDvg03(df,F_hl)
-    if rst == False:
-        return DvgRst()
-
-
     dvg = DvgSet(df,F_hl)
     dvgrst = dvg.Go()
     # logger.info(dvgrst)
     return dvgrst
 
-def CheckDvg02(df):
+def EnterCheck(df):
+    return Enter02(df) and Enter03(df)
+
+# 道理太窄，背离已经先去意义
+def Enter02(df):
     bollgap = df.bup.iat[-1] - df.blow.iat[-1]
     # rst = DvgRst()
     if (bollgap/df.blow.iat[-1] < Dvg02Para):
@@ -77,16 +76,15 @@ def CheckDvg02(df):
         return False
     return True
 
-# 知道方向后，进行反向段检查，因为反向段很容易出现新高
-def CheckDvg03(df,F_hl):
-    m1 = df.macd.iat[-1]
-    m2 = df.macd.iat[-2]
-    m3 = df.macd.iat[-3]
-    if F_hl == 1 and m3 > m2 and m2 > m1: # 只对顶背离生效
+# 不准MACD还在继续开口。
+def Enter03(df):
+    v1 = df.macd.iat[-1] # 右
+    v2 = df.macd.iat[-2] # 左
+    if abs(v2) <= abs(v1):
         return False
-    # if F_hl == -1 and m3 < m2 and m2 < m1:
-    #     return False
     return True
+        
+
 
 # 入口 极值检查   
 # 目前使用 倒数第二天的价格必须是极值
@@ -233,7 +231,9 @@ class DvgSet:
 
         # 进入基础判断
         if self.BlockL10.IsValid(): # 左块是有效的话
-            self.TyASet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
+            # self.TyASet.InitBlock2(bokL10.RepUn, bokL5.RepUn, self.F_hl)
+            self.TyASet.InitPoint2(self.DF,bokL10.RepUn.Idx,bokL5.RepUn.Idx, self.F_hl)
+            self.TyASet.SetType("TypeA")
             rst = self.TyASet.IsDvg()
             if rst:  
                 modL = "10"  # 默认简单双块背离
@@ -257,10 +257,15 @@ class DvgSet:
         if self.DvgRst.F_hl == 0:
             return
         
-        if self.BlockL5.SetTyB.OK:
-            if self.BlockL5.SetTyB.CheckGN01() == False:
+        if self.BlockL5.SetTyB.OK: # 本次是块内背离哦
+            setTyB = self.BlockL5.SetTyB
+            if setTyB.CheckGN01() == False:
                 self.DvgRst.Patch = "GN01"
                 return
+            if setTyB.CheckDvg13() == False:
+                self.DvgRst.Patch = "Dvg13"
+                return
+
 
 
         # self.BlockL5.
@@ -347,14 +352,14 @@ class Block:
         logger.info("Block [%s,%s]" % (DFTime(df, self.ILe), DFTime(df, self.IRi)))
 
 
-# 判断背离
+# 放入两点，准备来判断背离
 class DvgSignal:
     def __init__(self):
         self.LU = DvgUnit()
         self.RU = DvgUnit()
         self.F_hl = 0
         self.OK = False
-
+        
     # two point
     def InitPoint2(self, df, idxL, idxR, f_hl):
         if idxL > idxR: # 价值极值总在右边
@@ -362,13 +367,10 @@ class DvgSignal:
         self.LU.Init(df, idxL)
         self.RU.Init(df, idxR)
         self.F_hl = f_hl
+        self.DF = df
 
-    # typeA类型的背离
-    def InitBlock2(self, lu, ru, f_hl):
-        self.LU = lu
-        self.RU = ru
-        self.F_hl = f_hl
-        self.Type = "TypeA"
+    def SetType(self,ty):
+        self.Type = ty
 
     # GN01 块内背离的两点,M线值必须同正负
     def CheckGN01(self):
@@ -377,6 +379,41 @@ class DvgSignal:
         if (AvgMvL*AvgMvR) < 0: 
             return False
         return True
+    
+
+    # Dvg13 对于反向段来说，我们希望M块的rate要合格
+    def CheckDvg13(self):
+        if self.RU.Idx - self.LU.Idx== 1: # 相临两点的，一定是无效（在5M级别）
+            return False
+        
+        isReverse = self.CheckIsReverse() 
+        if isReverse == False:
+            return True # 通过
+        # 是反向段哦
+        if self.Rate < 0.5:
+            return True # 通过
+        return False
+    
+    # 是不是反向段呢？
+    def CheckIsReverse(self):
+        df = self.DF
+        rRepV = df.loc[self.RU.Idx, 'repv'] 
+        lRepV = df.loc[self.LU.Idx, 'repv'] 
+        midIdx = round((self.LU.Idx+self.RU.Idx)/2)
+        mRepV = df.loc[midIdx, 'repv'] 
+
+        m1 = df.macd.iat[-2]
+        m2 = df.macd.iat[-3]
+        m3 = df.macd.iat[-4]
+        # 这说明没有形成突点，M块一直在回归
+        if abs(m3) > abs(m2) and abs(m2) > abs(m1):
+            return True
+        if self.F_hl == 1:
+            if lRepV < mRepV and mRepV < rRepV:
+                return True
+        if self.F_hl == -1 and lRepV > mRepV and mRepV > rRepV:
+            return True
+        return False
 
     # GN03
     def IsDvgPatchTypeA(self):
@@ -390,6 +427,7 @@ class DvgSignal:
 
     def IsDvg(self):
         f_hl = self.F_hl
+
         if f_hl == 1:  # red
             if self.RU.Pv >= self.LU.Pv*(1 - DvgExtmFixPara) and self.RU.Mv <= self.LU.Mv:
                 self.OK = True
@@ -424,6 +462,8 @@ class DvgUnit:
         self.Time = df.loc[idx, 'time']
         self.Mdea = df.loc[idx, 'dea']
         self.Mdif = df.loc[idx, 'dif']
+      
+
 
 
 # ----------------- struct -----------------

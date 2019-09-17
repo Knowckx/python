@@ -29,8 +29,9 @@ class BackTest:
                 break
             rst = dvg.Start(dftest) # 开始
             # print(dftest.time.iat[-1])
-            
-            if rst.F_hl == 0:
+
+            # 开始检查结果
+            if rst.F_hl == 0 or rst.Patch != "":
                 idx -=1
                 continue
             rst.Print()

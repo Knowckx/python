@@ -15,6 +15,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/Quant/A50/main.Py",
+            "console": "integratedTerminal"
         },
         {
             "name": "FutuStart",
