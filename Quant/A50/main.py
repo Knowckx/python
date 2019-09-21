@@ -5,11 +5,11 @@ import datetime
 
 
 def StartBTest():
-    srcFile = '000925.XSHG_5m' # 不用后缀名
+    srcFile = '000300.XSHG_5m' # 不用后缀名
     shName = '5m' # 同grade
     bTest = bt.BackTest(shName)
     df = csv.GetPDdata(srcFile)  # data prepare
-    # print(df[-2:])
+    print(df[-2:])
     bTest.StartWith(df,shName) 
 
 
