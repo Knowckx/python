@@ -24,7 +24,7 @@ logger = GetLogHandle()
 
 # DVG判断修正参数,防止接近新高但是未到，却背离的情况
 DvgExtmFixPara = 0.0018 
-Dvg02Para = 0.03  # DVG02 股价形成非常狭窄的通道时，不再进行背离运算
+Dvg02Para = 0.025  # DVG02 股价形成非常狭窄的通道时，不再进行背离运算
 def SetGradeFixPara(grade):
     global DvgExtmFixPara
     global Dvg02Para
@@ -48,9 +48,9 @@ def Init(grade):
 
 # 入口
 def Start(df):
-    # debugP = '2019-09-05 10:40:00'
-    # if df.time.iloc[-1] == debugP:
-    #     print("debug at" + debugP)
+    debugP = '2019-09-18 11:10:00'
+    if df.time.iloc[-1] == debugP:
+        print("debug at" + debugP)
     rst = EnterCheck(df)
     if rst == False:
         return DvgRst()
@@ -145,7 +145,7 @@ class DvgSet:
     # P1 dig Block L5
     def GetBlockL5(self):
         dfRecent = self.DF[-RecnetBarsLen:]
-        bok = self.DigBlockWithPoint(dfRecent)
+        bok = self.DigBokRiWithPoint(dfRecent)
         if bok.IsValid() == False:
             return False
         bok.Anal(self.F_hl)
@@ -153,11 +153,11 @@ class DvgSet:
 
     # func1 given index_right,given ask [high,1,red or low,-1,green] to find the wholeblock
     # 鉴定右块的左右边界 
-    def DigBlockWithPoint(self, df):
+    def DigBokRiWithPoint(self, df):
         tempbok = Block()
         h_l = self.F_hl
-        idxTar = GetLocalExtm(df,h_l)
         # 是否是 单点背离 - 反色 的形态
+        idxTar = GetBokRiLocalExtm(df,h_l)
         mv = df.loc[idxTar, 'macd']
         if (h_l == 1 and mv < 0) or (h_l == -1 and mv > 0):
             tempbok.Init(idxTar, idxTar, df)
@@ -259,9 +259,9 @@ class DvgSet:
         
         if self.BlockL5.SetTyB.OK: # 本次是块内背离哦
             setTyB = self.BlockL5.SetTyB
-            if setTyB.CheckGN01() == False:
-                self.DvgRst.Patch = "GN01"
-                return
+            # if setTyB.CheckGN01() == False:
+            #     self.DvgRst.Patch = "GN01"
+            #     return
             if setTyB.CheckDvg13() == False:
                 self.DvgRst.Patch = "Dvg13"
                 return
@@ -317,21 +317,28 @@ class Block:
         self.TLe = df.loc[self.ILe,"time"]
         self.TRi = df.loc[self.IRi,"time"]
 
-        idxP = GetLocalExtm(df,f_hl)  # 本块的价格极值点
+        clList = df.close.loc[self.ILe:self.IRi]
+        idxP = clList.idxmax() 
+        if f_hl == -1:
+            idxP = clList.idxmin()
         self.RepUn.Init(df, idxP)    # 本块总是由价格极值代表
 
         # 向左找的较大点的M块极值点
-        idxM = idxP
+        idxM = idxP - 1
         while (idxM > self.ILe):
-            idxM -= 1  # 左移动
-            tempLis = df.macd.loc[idxM-3:idxM]
+            tempLis = df.macd.loc[idxM-3:idxM+1]
             # print(tempLis)
+            temp = 0
             if f_hl == -1:
-                if tempLis.idxmin() == idxM:
-                    break
+                temp = tempLis.idxmin()
             if f_hl == 1:
-                if tempLis.idxmax() == idxM:
-                    break
+                temp = tempLis.idxmax()
+            if temp == idxM:
+                break
+            if temp < idxM:
+                idxM = temp
+            else:
+                idxM -= 1  # 左移动
         # print(df.loc[idxM,"time"])
         self.Mv = self.DF.loc[idxM,"macd"] # 保存一下本块的MACD极值
         
@@ -512,7 +519,7 @@ def DFTime(df, idx):
 
 
 # 最近的两个点中，实际被选出的点的idx
-def GetLocalExtm(df,h_l):
+def GetBokRiLocalExtm(df,h_l):
     clList = df.close[-2:]  # 在我们的模型中，最近两个bar一定有一个代表点
     idxTar = clList.idxmax() 
     if h_l == -1:

@@ -9,7 +9,7 @@ def StartBTest():
     shName = '5m' # 同grade
     bTest = bt.BackTest(shName)
     df = csv.GetPDdata(srcFile)  # data prepare
-    print(df[-2:])
+    # print(df[-2:])
     bTest.StartWith(df,shName) 
 
 
