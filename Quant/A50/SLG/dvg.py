@@ -24,10 +24,10 @@ logger = GetLogHandle()
 
 # DVG判断修正参数,防止接近新高但是未到，却背离的情况
 DvgExtmFixPara = 0.0018 
-Dvg02Para = 0.025  # DVG02 股价形成非常狭窄的通道时，不再进行背离运算
+ChanEnter01Para = 2.5  # DVG02 股价形成非常狭窄的通道时，不再进行背离运算
 def SetGradeFixPara(grade):
     global DvgExtmFixPara
-    global Dvg02Para
+    global ChanEnter01Para
     fixed = 1
     if grade == "1d":
         fixed = 1
@@ -38,53 +38,63 @@ def SetGradeFixPara(grade):
     if grade == "5m":
         fixed = 2*2*1.5 # 就是6
     DvgExtmFixPara = DvgExtmFixPara/fixed
-    Dvg02Para = Dvg02Para/fixed
+    ChanEnter01Para = ChanEnter01Para/fixed
 
 # 这个包需要手动初始化一次
 def Init(grade):
     SetGradeFixPara(grade)
-    # print(Dvg02Para)
+    # print(ChanEnter01Para)
 # -----------------Main Start-----------------
+
+def DebugAt(df,debugP):
+    if debugP == "":
+        return
+    print("now is:" + df.time.iat[-1])
+    if df.time.iloc[-1] == debugP:
+        print("debug at:" + debugP)
 
 # 入口
 def Start(df):
-    debugP = '2019-09-18 11:10:00'
-    if df.time.iloc[-1] == debugP:
-        print("debug at" + debugP)
+    DebugAt(df,'2019-09-16 14:45:00')
+    # 先检查通道模式
+    chSign = Channel()
+    rst = chSign.Go(df)
+    if rst.Type != "": # 说明已经处于通道模式了
+        return rst
+
+    # 有需要再检查dvg模式
     rst = EnterCheck(df)
     if rst == False:
-        return DvgRst()
+        return JudgeRst()
 
     F_hl = IsExtmAndTurn(df.close)
     if F_hl == 0:
-        return DvgRst()
+        return JudgeRst()
 
     dvg = DvgSet(df,F_hl)
-    dvgrst = dvg.Go()
-    # logger.info(dvgrst)
-    return dvgrst
+    rst = dvg.Go()
+    # logger.info(JudgeRst)
+    return rst
 
 def EnterCheck(df):
-    return Enter02(df) and Enter03(df)
+    return Enter03(df)
 
-# 道理太窄，背离已经先去意义
-def Enter02(df):
-    bollgap = df.bup.iat[-1] - df.blow.iat[-1]
-    # rst = DvgRst()
-    if (bollgap/df.blow.iat[-1] < Dvg02Para):
-        # print("Dvg02 通道过窄,pass")
-        return False
-    return True
+
 
 # 不准MACD还在继续开口。
 def Enter03(df):
-    v1 = df.macd.iat[-1] # 右
-    v2 = df.macd.iat[-2] # 左
-    if abs(v2) <= abs(v1):
+    le = df.macd.iat[-2] # 左
+    fixLe = le*(1+0.01)  # 最大可以接受的右值
+    ri = df.macd.iat[-1] # 右
+    if abs(fixLe) <= abs(ri): #比修正值还大。确认为在继续开口
         return False
     return True
         
+# 200   
 
+# 199
+# 200
+# 201
 
 # 入口 极值检查   
 # 目前使用 倒数第二天的价格必须是极值
@@ -130,17 +140,17 @@ class DvgSet:
         self.BlockL5 = Block()  # 块内背离在这里检查
         self.BlockL10 = Block() 
         self.TyASet = DvgSignal() # 双块背离的检查
-        self.DvgRst = DvgRst() # 本次背离的判断结果
+        self.JudgeRst = JudgeRst() # 本次背离的判断结果
 
     # P1 P2
     def Go(self):
         rstL5 = self.GetBlockL5()
         if rstL5 == False:
-            return DvgRst()
+            return JudgeRst()
         self.GetBlockL10()
         self.BaseLog()
         self.PatchLog()
-        return self.DvgRst
+        return self.JudgeRst
 
     # P1 dig Block L5
     def GetBlockL5(self):
@@ -224,7 +234,7 @@ class DvgSet:
 
     # 基础背离判断
     def BaseLog(self):
-        self.DvgRst = DvgRst() # 本函数返回的结果集
+        self.JudgeRst = JudgeRst() # 本函数返回的结果集
         bokL5 = self.BlockL5
         bokL10 = self.BlockL10
         modL,modR = "",""
@@ -246,37 +256,32 @@ class DvgSet:
             return
 
         # 看来是有效的
-        self.DvgRst.F_hl = self.F_hl
-        self.DvgRst.Time = self.DF.time.iat[-1]
-        self.DvgRst.Mode = modL + " " + modR
-        self.DvgRst.Detail = "{} {}".format(self.TyASet.String(),bokL5.SetTyB.String())
+        self.JudgeRst.F_hl = self.F_hl
+        self.JudgeRst.Time = self.DF.time.iat[-1]
+        self.JudgeRst.Mode = modL + " " + modR
+        self.JudgeRst.Detail = "{} {}".format(self.TyASet.String(),bokL5.SetTyB.String())
         return 
 
     # 加上筛选项的进阶背离判断
     def PatchLog(self):
-        if self.DvgRst.F_hl == 0:
+        if self.JudgeRst.F_hl == 0:
             return
         
+        if self.TyASet.IsDvgPatchTypeA() == False:
+            self.JudgeRst.Patch = "PatchTypeA"
+            return
+
         if self.BlockL5.SetTyB.OK: # 本次是块内背离哦
             setTyB = self.BlockL5.SetTyB
             # if setTyB.CheckGN01() == False:
-            #     self.DvgRst.Patch = "GN01"
+            #     self.JudgeRst.Patch = "GN01"
             #     return
             if setTyB.CheckDvg13() == False:
-                self.DvgRst.Patch = "Dvg13"
+                self.JudgeRst.Patch = "Dvg13"
                 return
 
 
-
-        # self.BlockL5.
-
-        # self.DvgRst.IsSame
-                    # rst2 = mSet.IsDvgPatchTypeA()
-            # if rst2 == False:
-            #     modL = "10(Filter)" # 左侧被过滤掉了
-            #     modR = ""
-
-
+        
 
         # dvgTime = self.DF.time.iat[-1]
         # modmsg  = modL + " " + modR
@@ -324,8 +329,12 @@ class Block:
         self.RepUn.Init(df, idxP)    # 本块总是由价格极值代表
 
         # 向左找的较大点的M块极值点
-        idxM = idxP - 1
+        idxM = idxP
         while (idxM > self.ILe):
+            idxM -= 1
+            if idxM == self.ILe+1:
+                idxM = idxP
+                break
             tempLis = df.macd.loc[idxM-3:idxM+1]
             # print(tempLis)
             temp = 0
@@ -336,11 +345,10 @@ class Block:
             if temp == idxM:
                 break
             if temp < idxM:
-                idxM = temp
-            else:
-                idxM -= 1  # 左移动
+                idxM = temp+1
+        
         # print(df.loc[idxM,"time"])
-        self.Mv = self.DF.loc[idxM,"macd"] # 保存一下本块的MACD极值
+        self.Mv = df.loc[idxM,"macd"] # 保存一下本块的MACD极值
         
         if idxP == idxM:
             # logger.info("Block Desc:Single extm")
@@ -366,7 +374,8 @@ class DvgSignal:
         self.RU = DvgUnit()
         self.F_hl = 0
         self.OK = False
-        
+        self.Type = "" #种类
+
     # two point
     def InitPoint2(self, df, idxL, idxR, f_hl):
         if idxL > idxR: # 价值极值总在右边
@@ -426,11 +435,13 @@ class DvgSignal:
     def IsDvgPatchTypeA(self):
         if self.Type != "TypeA":
             return True #默认背离有效
+        if self.LU.Mdea * self.RU.Mdea < 0 and (self.RU.Idx - self.LU.Idx) < 15:
+            return True
         AvgL = (self.LU.Mdea + self.LU.Mdif)/2
         AvgR = (self.RU.Mdea + self.RU.Mdif)/2
-        if (AvgR*AvgL)>0 and abs(AvgL) < abs(AvgR):
-            return False
-        return True
+        if (AvgR*AvgL)>0 and abs(AvgL)*0.8 > abs(AvgR):
+            return True 
+        return False
 
     def IsDvg(self):
         f_hl = self.F_hl
@@ -476,9 +487,10 @@ class DvgUnit:
 # ----------------- struct -----------------
 
 # 表达背离结果
-class DvgRst:
+class JudgeRst:
     def __init__(self):
-        self.F_hl = 0  # 背离信号类别 0表示非背离
+        self.Type = "" # 模式 背离 - 通道
+        self.F_hl = 0  # 1 顶  -1 底   0 无效
         self.Time = "" # 时间
         self.Mode = "" # 模式
         self.Detail = "" # 详细点位
@@ -490,6 +502,7 @@ class DvgRst:
             FormatDate = "%Y-%m-%d"
         self.Time = datetime.datetime.strptime(self.Time, FormatDate)
 
+    # inRst = excel里的记录
     def IsSame(self,inRst):
         if inRst.F_hl == 0:
             return False
@@ -503,12 +516,12 @@ class DvgRst:
 
 
     def String(self):
-        return "time:{} flag:{}".format(self.Time,self.F_hl)
+        return "JudgeRst time:{} type:[{}] flag:{}".format(self.Time,self.Type,self.F_hl)
 
     def Print(self):
         logger.info(self.String())
-        # logger.info(" || mode:{}".format(,self.Mode))
-        logger.info(self.Detail + self.Patch)
+        if self.Type != StrChannelSign:
+            logger.info(self.Detail + self.Patch)
         # logger.info("\n")
 
 # ----------------- Func -----------------
@@ -529,16 +542,63 @@ def GetBokRiLocalExtm(df,h_l):
 # def test():
 
 
+#--------------------------------------------全局变量
+StrChannelSign = "Channel Sign" # type 通道模式
 
+#--------------------------------------------通道模式
 
+class Channel:
+    def __init__(self):  
+        pass
     
-#     if modL == "10(Filter)" and modR == "": #虽然背离，但是被过滤了
-#         msg = "---> time:{} msg:{} Pass!\n".format(dvgTime,modmsg)
-#         logger.info(msg)
-#         return mRst
+    def Go(self,df):
+        rst = JudgeRst()
+        if self.Enter(df) == False:
+            return rst
+        rst.Type = StrChannelSign # 已经处于通道模式啦
+        rst.Time = df.time.iat[-1]
+        idxNow = df.index[-1]
+        rst.F_hl = IsPriceOutBoll(df,idxNow)
+        lrtLimit = 0.2
+        lrt = GetLineRate(df,idxNow)
+        if (lrt > lrtLimit and rst.F_hl ==1) or  (lrt < lrtLimit*-1 and rst.F_hl == -1):
+            print(lrt)
+            rst.F_hl = 0
+            rst.Type = ""
+        return rst
 
+    # 通道模式进入条件检查
+    def Enter(self,df):
+        br1 = df.borate.iat[-1]
+        br2 = df.borate.iat[-2]
+        if br1 + br2 < ChanEnter01Para*2:
+            return True
+        return False
+    
+    # 手动算boll的rate率
+    def GetBollRate(self,df):
+        bollgap = df.bup.iat[-1] - df.blow.iat[-1]
+        return bollgap/df.blow.iat[-1]
 
-            # rst2 = mSet.IsDvgPatchTypeA()
-            # if rst2 == False:
-            #     modL = "10(Filter)" # 左侧被过滤掉了
-            #     modR = ""
+# 判断某的点位的Price是不是在boll轨外
+def IsPriceOutBoll(df,idx):
+    fg = 0
+    fix = 0.02 #万5的缓冲
+    open = df.open.at[idx]
+    close = df.close.at[idx]
+    bup = df.bup.at[idx]*(1-fix/100)
+    blow = df.blow.at[idx]*(1+fix/100)
+    if open > bup or close > bup:
+        fg = 1
+    if open < blow or close < blow:
+        fg = -1           
+    return fg
+
+# 最近7天的斜率
+def GetLineRate(df,idx):
+    barunit = 3
+    bars = 10
+    P1 = df.bmid.at[idx]
+    P2 = df.bmid.at[idx-bars]
+    rst = (P1-P2)/(bars*barunit)
+    return rst
