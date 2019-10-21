@@ -52,78 +52,109 @@ def DebugAt(df,debugP):
     print("now is:" + df.time.iat[-1])
     if df.time.iloc[-1] == debugP:
         print("debug at:" + debugP)
+        logger.setLevel(logging.DEBUG) # 可以打印
+
 
 # 入口
 def Start(df):
-    DebugAt(df,'2019-09-16 14:45:00')
+    DebugAt(df,'2019-10-21 10:00:00')
     # 先检查通道模式
-    chSign = Channel()
-    rst = chSign.Go(df)
-    if rst.Type != "": # 说明已经处于通道模式了
-        return rst
+    # chSign = Channel()
+    # rst = chSign.Go(df)
+    # if rst.Type != "": # 说明已经处于通道模式了
+    #     return rst
 
     # 有需要再检查dvg模式
     rst = EnterCheck(df)
-    if rst == False:
-        return JudgeRst()
+    if rst.F_hl == 0:
+        return rst
 
-    F_hl = IsExtmAndTurn(df.close)
-    if F_hl == 0:
-        return JudgeRst()
-
-    dvg = DvgSet(df,F_hl)
+    dvg = DvgSet(df,rst.F_hl)
     rst = dvg.Go()
     # logger.info(JudgeRst)
     return rst
 
 def EnterCheck(df):
-    return Enter03(df)
+    rst = JudgeRst()
+    flag = IsExtmAndTurn(df) # step1,大概得到flag
+    if flag == 0:
+        return rst
+    logger.debug("EnterCheck get flag:{}".format(flag))
+
+    if not Enter03(df,flag):
+        return rst
+
+    rst.F_hl = flag # ok了
+    return  rst
 
 
 
 # 不准MACD还在继续开口。
-def Enter03(df):
+def Enter03(df,flag):
     le = df.macd.iat[-2] # 左
-    fixLe = le*(1+0.01)  # 最大可以接受的右值
+    fixLe = le*(1+0.01)  # 允许右值大一丢丢
     ri = df.macd.iat[-1] # 右
-    if abs(fixLe) <= abs(ri): #比修正值还大。确认为在继续开口
-        return False
-    return True
+    if flag == -1:
+        return ri > fixLe
+    elif flag == 1:
+        return ri < fixLe
+    return False
         
-# 200   
 
-# 199
-# 200
-# 201
+
+
 
 # 入口 极值检查   
 # 目前使用 倒数第二天的价格必须是极值
-def IsExtmAndTurn(clList):
+def IsExtmAndTurn(df):
+    clList = df.close
     closeList = clList[-ExtmCheckLen:] # 收盘价数组
-    flag = 0
-    tarP1 = closeList.iat[-1]  # 最近两天的价格与坐标
-    idxP1 =  closeList.index[-1]
-    tarP2 = closeList.iat[-2] 
-    idxP2 =  closeList.index[-2]
 
-    localList = closeList[-ExtmCheckLen:-2] #不包含今天和昨天
-    # print(len(closeList))
-    # print(closeList[-5:])   
-
+    # 首先，大体判断，昨天的价格必须是最近的大概极限值位置
+    flag = 0 
+    tarP2 = closeList.iat[-2]  # 昨天的价格
+    localList = closeList[-ExtmCheckLen:-2] # 不包含今天和昨天的这一段 表示近期的局部极限值
+    localMax = localList.max()
+    localMin = localList.min()
     
-    minidx = localList.idxmin() #不包含今天和昨天
-    fixminP = localList.loc[minidx]*(1 + DvgExtmFixPara)
+    if tarP2-localMin > (localMax-localMin)*0.9:
+        flag = 1
+    elif tarP2-localMin < (localMax-localMin)*1.1:
+        flag = -1
 
-    # 希望昨天是个低值  同时今天比昨天要缓和
-    if tarP2 <= fixminP and tarP1 >= tarP2*(1 - DvgExtmFixPara):
-        return -1
+    if flag == 0: #初步判断，本次无效，不用继续了
+        return flag
+    
+    tarP2 = getFixRepClose(flag,df,tarP2)
 
-    # 最大值的情况下
-    maxidx = localList.idxmax()
-    fixmaxP = localList.loc[maxidx]*(1 - DvgExtmFixPara)
-    if tarP2 >= fixmaxP and tarP1 <= tarP2*(1 + DvgExtmFixPara):
-        return 1
+    tarP1 = closeList.iat[-1]  # 今天的价格
+    if flag == 1: # 高位的情况
+        fixmaxP = localMax*(1 - DvgExtmFixPara)
+        # 昨天的价格很高 同时今天缓和了
+        if tarP2 >= fixmaxP and tarP1 <= tarP2*(1 + DvgExtmFixPara):
+            return 1
+    elif flag == -1:
+        fixminP = localMin*(1 + DvgExtmFixPara)    
+        # 希望昨天是个低值  同时今天比昨天要缓和
+        if tarP2 <= fixminP and tarP1 >= tarP2*(1 - DvgExtmFixPara):
+            return -1
     return 0
+
+# 有时，今天的开盘价才是新高，需要修饰一下
+def getFixRepClose(flag,df,tarP2):
+    newOpen = df.open.iat[-1] #有时，今天的开盘价才是新高，修饰一下
+    if flag == 1 and newOpen > tarP2:
+        tarP2 = newOpen
+    if flag == -1 and newOpen < tarP2:
+        tarP2 = newOpen
+    return tarP2
+
+
+# 存在-2位置不是新高但是接近于新高。但是-1位置的开盘+最高值是新极值的情况
+def GetRepP1(df):
+    tarP1 = closeList.iat[-1] 
+
+
 
 # --------------------------------------------Class区--------------------------------------------
 
@@ -266,12 +297,19 @@ class DvgSet:
     def PatchLog(self):
         if self.JudgeRst.F_hl == 0:
             return
-        
-        if self.TyASet.IsDvgPatchTypeA() == False:
-            self.JudgeRst.Patch = "PatchTypeA"
-            return
 
-        if self.BlockL5.SetTyB.OK: # 本次是块内背离哦
+        # 单纯的typeA类型情况
+        if self.BlockL5.SetTyB.OK == False: 
+            if self.TyASet.IsDvgPatchTypeA() == False:
+                self.JudgeRst.Patch = "PatchTypeA"
+                return
+            
+            if self.TyASet.CheckGN04() == False:
+                self.JudgeRst.Patch = "GN04"
+                return
+
+        # 本次是块内背离
+        if self.BlockL5.SetTyB.OK: 
             setTyB = self.BlockL5.SetTyB
             # if setTyB.CheckGN01() == False:
             #     self.JudgeRst.Patch = "GN01"
@@ -322,10 +360,12 @@ class Block:
         self.TLe = df.loc[self.ILe,"time"]
         self.TRi = df.loc[self.IRi,"time"]
 
+        idxP = 0
         clList = df.close.loc[self.ILe:self.IRi]
-        idxP = clList.idxmax() 
-        if f_hl == -1:
-            idxP = clList.idxmin()
+        if self.ILe == self.IRi:
+            idxP = self.IRi
+        else:
+            idxP = clList.index[-2] 
         self.RepUn.Init(df, idxP)    # 本块总是由价格极值代表
 
         # 向左找的较大点的M块极值点
@@ -396,6 +436,11 @@ class DvgSignal:
             return False
         return True
     
+    #GN04 我们期待dif线已经开始反转
+    def CheckGN04(self):
+        le = self.RU.Mdif
+        ri = self.DF.loc[self.RU.Idx+1, 'dif']
+        return abs(le) > abs(ri)
 
     # Dvg13 对于反向段来说，我们希望M块的rate要合格
     def CheckDvg13(self):
@@ -443,15 +488,16 @@ class DvgSignal:
             return True 
         return False
 
+    # 背离的主判断
     def IsDvg(self):
         f_hl = self.F_hl
-
-        if f_hl == 1:  # red
-            if self.RU.Pv >= self.LU.Pv*(1 - DvgExtmFixPara) and self.RU.Mv <= self.LU.Mv:
+        RUP = getFixRepClose(f_hl,self.DF,self.RU.Pv)
+        if f_hl == 1:  # 高点反转：价格至少接近于新高，同时，MACD减小
+            if RUP >= self.LU.Pv*(1 - DvgExtmFixPara) and self.RU.Mv <= self.LU.Mv:
                 self.OK = True
                 self.Rate = round(self.RU.Mv/self.LU.Mv,3)
-        if f_hl == -1:
-            if self.RU.Pv <= self.LU.Pv*(1 + DvgExtmFixPara) and self.RU.Mv >= self.LU.Mv:
+        elif f_hl == -1:
+            if RUP <= self.LU.Pv*(1 + DvgExtmFixPara) and self.RU.Mv >= self.LU.Mv:
                 self.OK = True
                 self.Rate = round(self.RU.Mv/self.LU.Mv,3)
         return self.OK

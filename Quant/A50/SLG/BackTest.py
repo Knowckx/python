@@ -48,7 +48,6 @@ class BackTest:
                 print("stop at tar:{} need:{}".format(rst.Time,ch.Time))
                 break
 
-
     # excel里的下一个验证点
     def GetNextVerify(self):
         df = self.verifyDF
